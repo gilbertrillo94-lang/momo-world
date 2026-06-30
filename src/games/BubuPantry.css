@@ -1,0 +1,804 @@
+.bubu-sort-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 999999;
+  display: grid;
+  place-items: center;
+  background: rgba(22, 10, 30, 0.52);
+  backdrop-filter: blur(8px);
+}
+
+.bubu-sort-panel {
+  position: relative;
+  width: min(94vw, 430px);
+  height: min(92dvh, 820px);
+  overflow: hidden;
+  border-radius: 34px;
+ background:
+  url("/games/bubu/bubu-pantry-bg.png") center center / cover no-repeat;
+  box-shadow: 0 24px 70px rgba(30, 12, 20, .42);
+}
+
+.bubu-sort-close {
+  position: absolute;
+  top: 14px;
+  left: 14px;
+  z-index: 80;
+  width: 46px;
+  height: 46px;
+  border: 0;
+  border-radius: 50%;
+  background: rgba(255,255,255,.94);
+  color: #704222;
+  font-size: 1.8rem;
+  font-weight: 1000;
+  box-shadow: 0 8px 18px rgba(80, 40, 20, .2);
+}
+
+.bubu-sort-top {
+  position: absolute;
+  top: 14px;
+  left: 68px;
+  right: 14px;
+  z-index: 30;
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 8px;
+}
+
+.bubu-sort-top div {
+  padding: 8px 6px;
+  border-radius: 18px;
+  background: rgba(255,255,255,.93);
+  color: #704222;
+  text-align: center;
+  box-shadow: 0 8px 18px rgba(80, 40, 20, .14);
+}
+
+.bubu-sort-top span {
+  display: block;
+  color: #d57a35;
+  font-size: .62rem;
+  font-weight: 1000;
+}
+
+.bubu-sort-top strong {
+  font-size: 1rem;
+  font-weight: 1000;
+}
+
+.bubu-sort-title {
+  position: absolute;
+  top: 82px;
+  left: 0;
+  right: 0;
+  z-index: 20;
+  text-align: center;
+  color: white;
+  text-shadow: 0 3px 8px rgba(90, 45, 15, .35);
+}
+
+.bubu-sort-title p {
+  margin: 0;
+  color: #fff7d8;
+  letter-spacing: .14em;
+  font-size: .74rem;
+  font-weight: 1000;
+}
+
+.bubu-sort-title h2 {
+  margin: 0;
+  font-size: 2.05rem;
+  line-height: 1;
+}
+
+.bubu-sort-board {
+  position: absolute;
+  left: 18px;
+  right: 18px;
+  top: 154px;
+  bottom: 132px;
+  z-index: 16;
+
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 14px 12px;
+  align-content: center;
+}
+
+.bubu-basket {
+  border: 0;
+  background: transparent;
+  padding: 0;
+  min-height: 170px;
+}
+
+.bubu-basket-inner {
+  position: relative;
+  width: 100%;
+  height: 170px;
+  padding: 12px 12px 16px;
+  border-radius: 24px 24px 30px 30px;
+
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  gap: 5px;
+
+  background:
+    linear-gradient(180deg, rgba(255, 247, 226, .92), rgba(255, 218, 162, .92));
+  box-shadow:
+    inset 0 0 0 4px rgba(122, 67, 31, .55),
+    inset 0 -12px 0 rgba(122, 67, 31, .22),
+    0 12px 22px rgba(70, 32, 12, .22);
+}
+
+.bubu-basket-inner::after {
+  content: "";
+  position: absolute;
+  left: 10px;
+  right: 10px;
+  bottom: 8px;
+  height: 8px;
+  border-radius: 999px;
+  background: rgba(100, 52, 22, .22);
+}
+
+.bubu-basket-slot {
+  height: 32px;
+  display: grid;
+  place-items: center;
+  border-radius: 14px;
+  background: rgba(255, 255, 255, .22);
+  font-size: 1.8rem;
+}
+
+.bubu-basket-slot.filled {
+  background: rgba(255,255,255,.72);
+  box-shadow:
+    inset 0 2px 4px rgba(255,255,255,.65),
+    0 4px 8px rgba(70,30,10,.14);
+  animation: bubuSnackPop .18s ease;
+}
+
+.bubu-basket.selected .bubu-basket-inner {
+  transform: translateY(-8px) scale(1.03);
+  box-shadow:
+    0 0 0 4px #fff2a8,
+    0 0 18px rgba(255,240,160,.75),
+    inset 0 0 0 4px rgba(122, 67, 31, .55),
+    inset 0 -12px 0 rgba(122, 67, 31, .22),
+    0 16px 28px rgba(70, 32, 12, .28);
+}
+
+.bubu-basket.complete .bubu-basket-inner {
+  background:
+    linear-gradient(180deg, rgba(241, 255, 220, .95), rgba(197, 238, 150, .92));
+}
+
+.bubu-sort-message {
+  position: absolute;
+  left: 18px;
+  right: 18px;
+  bottom: 28px;
+  z-index: 28;
+  min-height: 86px;
+  padding: 12px 16px 12px 90px;
+  border-radius: 26px;
+  background: rgba(255,255,255,.93);
+  color: #704222;
+  font-weight: 900;
+  box-shadow: 0 12px 24px rgba(80, 40, 20, .18);
+}
+
+.bubu-sort-message img {
+  position: absolute;
+  left: 8px;
+  bottom: -4px;
+  width: 86px;
+  height: 86px;
+  object-fit: contain;
+  filter: drop-shadow(0 8px 10px rgba(60, 25, 10, .24));
+}
+
+.bubu-sort-message p {
+  margin: 10px 0 0;
+  line-height: 1.25;
+}
+
+.bubu-sort-result {
+  position: absolute;
+  inset: auto 22px 126px;
+  z-index: 90;
+  padding: 18px;
+  border-radius: 28px;
+  background: rgba(255,250,240,.98);
+  color: #704222;
+  text-align: center;
+  box-shadow: 0 18px 46px rgba(70, 30, 15, .34);
+}
+
+.bubu-sort-result h2 {
+  margin: 0 0 8px;
+}
+
+.bubu-sort-result p {
+  margin: 4px 0 12px;
+  font-weight: 900;
+}
+
+.bubu-sort-result button {
+  width: 100%;
+  margin-top: 8px;
+  border: 0;
+  border-radius: 999px;
+  padding: 12px;
+  background: linear-gradient(90deg, #d9853e, #f0ad5f);
+  color: white;
+  font-weight: 1000;
+}
+
+@keyframes bubuSnackPop {
+  0% { transform: scale(.8); }
+  70% { transform: scale(1.12); }
+  100% { transform: scale(1); }
+}
+
+@media (max-height: 740px) {
+  .bubu-sort-title {
+    top: 72px;
+  }
+
+  .bubu-sort-board {
+    top: 132px;
+    bottom: 116px;
+    gap: 10px;
+  }
+
+  .bubu-basket {
+    min-height: 148px;
+  }
+
+  .bubu-basket-inner {
+    height: 148px;
+  }
+
+  .bubu-sort-message {
+    bottom: 22px;
+    min-height: 72px;
+  }
+
+  .bubu-sort-message img {
+    width: 74px;
+    height: 74px;
+  }
+}.bubu-sort-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 999999;
+  display: grid;
+  place-items: center;
+  background: rgba(22, 10, 30, 0.52);
+  backdrop-filter: blur(8px);
+}
+
+.bubu-sort-panel {
+  position: relative;
+  width: min(94vw, 430px);
+  height: min(92dvh, 820px);
+  overflow: hidden;
+  border-radius: 34px;
+  background:
+    radial-gradient(circle at 50% 8%, rgba(255, 255, 255, .95), transparent 22%),
+    linear-gradient(180deg, #ffe4b5 0%, #ffd083 42%, #f3b75f 67%, #91c56b 100%);
+  box-shadow: 0 24px 70px rgba(30, 12, 20, .42);
+}
+
+
+
+/* close / back button */
+.bubu-sort-close {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  left: auto;
+  z-index: 80;
+
+  width: 48px;
+  height: 48px;
+
+  border: 0;
+  border-radius: 50%;
+
+  background: linear-gradient(180deg, #c47c36, #8f4f25);
+  color: #fff4cd;
+
+  font-size: 1.7rem;
+  font-weight: 1000;
+
+  box-shadow:
+    inset 0 2px 0 rgba(255,255,255,.35),
+    0 8px 18px rgba(80, 40, 20, .24);
+}
+
+/* hanging level/moves cards */
+.bubu-sort-top {
+  position: absolute;
+  top: 18px;
+  left: 18px;
+  right: auto;
+  z-index: 30;
+
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 10px;
+}
+
+.bubu-sort-top div {
+  width: 92px;
+  min-height: 78px;
+  padding: 10px 8px;
+
+  border-radius: 18px;
+
+  background: #ffe9bd;
+  color: #75431f;
+
+  text-align: center;
+
+  border: 3px solid #be7937;
+
+  box-shadow:
+    inset 0 2px 0 rgba(255,255,255,.55),
+    0 8px 18px rgba(80, 40, 20, .18);
+}
+
+.bubu-sort-top span {
+  display: block;
+  font-size: .72rem;
+  font-weight: 1000;
+  letter-spacing: .03em;
+  color: #8d4d25;
+}
+
+.bubu-sort-top strong {
+  display: block;
+  margin-top: 2px;
+  font-size: 2rem;
+  line-height: 1;
+  font-weight: 1000;
+}
+
+/* big logo sign */
+.bubu-sort-title {
+  position: absolute;
+  top: 24px;
+  left: 122px;
+  right: 70px;
+  z-index: 22;
+
+  min-height: 110px;
+  padding: 16px 10px;
+
+  border-radius: 28px;
+
+  background:
+    linear-gradient(180deg, #b56b2c, #7a3d1d);
+
+  text-align: center;
+  color: white;
+
+  box-shadow:
+    inset 0 4px 0 rgba(255,255,255,.24),
+    inset 0 -8px 0 rgba(69, 28, 10, .28),
+    0 10px 20px rgba(70, 30, 10, .22);
+
+  transform: rotate(-1deg);
+}
+
+.bubu-sort-title::before {
+  content: "BUBU'S";
+  position: absolute;
+  left: 50%;
+  top: -16px;
+  transform: translateX(-50%);
+
+  padding: 5px 16px;
+  border-radius: 999px;
+
+  background: linear-gradient(180deg, #98c653, #61942d);
+  color: #fff7cf;
+
+  font-size: .8rem;
+  font-weight: 1000;
+  letter-spacing: .06em;
+
+  box-shadow:
+    inset 0 2px 0 rgba(255,255,255,.35),
+    0 6px 12px rgba(70, 30, 10, .18);
+}
+
+.bubu-sort-title p {
+  display: none;
+}
+
+.bubu-sort-title h2 {
+  margin: 4px 0 0;
+  font-size: 2.15rem;
+  line-height: .95;
+  color: #ffd875;
+  text-shadow:
+    0 3px 0 #7a3516,
+    0 5px 10px rgba(70,30,10,.35);
+}
+
+.bubu-sort-title h2::after {
+  content: " SORT";
+  display: block;
+  color: #ff9fb0;
+  font-size: 2rem;
+}
+
+/* Bubu speech bubble */
+.bubu-sort-message {
+  position: absolute;
+  top: 112px;
+  right: 16px;
+  left: auto;
+  bottom: auto;
+  z-index: 28;
+
+  width: 148px;
+  min-height: 78px;
+
+  padding: 13px 14px;
+
+  border-radius: 28px;
+
+  background: rgba(255,255,255,.94);
+  color: #704222;
+
+  font-weight: 900;
+  text-align: center;
+
+  box-shadow: 0 12px 24px rgba(80, 40, 20, .18);
+}
+
+.bubu-sort-message::after {
+  content: "";
+  position: absolute;
+  right: 34px;
+  bottom: -11px;
+
+  width: 22px;
+  height: 22px;
+
+  background: rgba(255,255,255,.94);
+  transform: rotate(45deg);
+  border-radius: 5px;
+}
+
+
+
+.bubu-sort-message p {
+  margin: 0;
+  line-height: 1.25;
+  font-size: .88rem;
+}
+
+/* Goal card */
+.bubu-sort-board::before {
+  content: "GOAL  •  Sort all snacks!";
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: -78px;
+
+  height: 58px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  border-radius: 22px;
+
+  background: rgba(255, 239, 197, .96);
+  color: #704222;
+
+  font-weight: 1000;
+
+  border: 3px solid #c27a37;
+
+  box-shadow:
+    inset 0 2px 0 rgba(255,255,255,.5),
+    0 10px 20px rgba(80,40,20,.14);
+}
+
+/* board with baskets */
+.bubu-sort-board {
+  position: absolute;
+  left: 18px;
+  right: 18px;
+  top: 330px;
+  bottom: 104px;
+  z-index: 16;
+
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 14px 10px;
+  align-content: start;
+}
+
+.bubu-basket {
+  border: 0;
+  background: transparent;
+  padding: 0;
+  min-height: 158px;
+}
+
+.bubu-basket-inner {
+  position: relative;
+
+  width: 100%;
+  height: 158px;
+
+  padding: 12px 8px 16px;
+
+  border-radius: 30px;
+
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  gap: 4px;
+
+  background:
+    linear-gradient(180deg, #d99042 0%, #a65d2c 12%, #f1bd72 18%, #d1843c 100%);
+
+  box-shadow:
+    inset 0 0 0 4px rgba(130, 70, 30, .75),
+    inset 0 -12px 0 rgba(88, 45, 20, .22),
+    0 14px 22px rgba(70, 32, 12, .24);
+}
+
+.bubu-basket-inner::before {
+  content: "";
+  position: absolute;
+  inset: 8px;
+  border-radius: 22px;
+  background:
+    linear-gradient(180deg, #b96a32, #8a471f);
+  box-shadow: inset 0 4px 8px rgba(60, 25, 10, .22);
+  z-index: 0;
+}
+
+.bubu-basket-inner::after {
+  content: "🐾";
+  position: absolute;
+  left: 50%;
+  bottom: 12px;
+  transform: translateX(-50%);
+
+  color: rgba(255, 235, 190, .5);
+  font-size: 1.3rem;
+  z-index: 0;
+}
+
+.bubu-basket-slot {
+  position: relative;
+  z-index: 2;
+
+  height: 30px;
+
+  display: grid;
+  place-items: center;
+
+  border-radius: 14px;
+  background: transparent;
+
+  font-size: 1.65rem;
+}
+
+.bubu-basket-slot.filled {
+  background: rgba(255, 248, 232, .88);
+
+  box-shadow:
+    inset 0 2px 4px rgba(255,255,255,.65),
+    0 4px 8px rgba(70,30,10,.14);
+
+  animation: bubuSnackPop .18s ease;
+}
+
+.bubu-basket.selected .bubu-basket-inner {
+  transform: translateY(-8px) scale(1.03);
+
+  box-shadow:
+    0 0 0 4px #fff2a8,
+    0 0 18px rgba(255,240,160,.75),
+    inset 0 0 0 4px rgba(130, 70, 30, .75),
+    inset 0 -12px 0 rgba(88, 45, 20, .22),
+    0 18px 28px rgba(70, 32, 12, .28);
+}
+
+.bubu-basket.complete .bubu-basket-inner {
+  background:
+    linear-gradient(180deg, #d8aa4f 0%, #95c94d 100%);
+}
+
+/* bottom buttons like concept */
+
+.bubu-sort-bubu {
+  position: absolute;
+  right: 46px;
+  bottom: 18px;
+  z-index: 26;
+
+  width: 132px;
+  height: 132px;
+  object-fit: contain;
+
+  pointer-events: none;
+
+  filter: drop-shadow(0 10px 12px rgba(60, 25, 10, .24));
+}
+
+/* result */
+.bubu-sort-result {
+  position: absolute;
+  inset: auto 22px 126px;
+  z-index: 90;
+
+  padding: 18px;
+
+  border-radius: 28px;
+
+  background: rgba(255,250,240,.98);
+  color: #704222;
+
+  text-align: center;
+
+  box-shadow: 0 18px 46px rgba(70, 30, 15, .34);
+}
+
+.bubu-sort-result h2 {
+  margin: 0 0 8px;
+}
+
+.bubu-sort-result p {
+  margin: 4px 0 12px;
+  font-weight: 900;
+}
+
+.bubu-sort-result button {
+  width: 100%;
+  margin-top: 8px;
+
+  border: 0;
+  border-radius: 999px;
+
+  padding: 12px;
+
+  background: linear-gradient(90deg, #d9853e, #f0ad5f);
+  color: white;
+
+  font-weight: 1000;
+}
+
+@keyframes bubuSnackPop {
+  0% { transform: scale(.8); }
+  70% { transform: scale(1.12); }
+  100% { transform: scale(1); }
+}
+
+@media (max-height: 740px) {
+  .bubu-sort-title {
+    top: 18px;
+    min-height: 94px;
+  }
+
+  .bubu-sort-title h2 {
+    font-size: 1.8rem;
+  }
+
+  .bubu-sort-title h2::after {
+    font-size: 1.7rem;
+  }
+
+  .bubu-sort-message {
+    top: 104px;
+  }
+
+  
+  .bubu-sort-board {
+    top: 294px;
+    bottom: 92px;
+    gap: 10px 8px;
+  }
+
+  .bubu-sort-board::before {
+    top: -66px;
+    height: 50px;
+  }
+
+  .bubu-basket {
+    min-height: 138px;
+  }
+
+  .bubu-basket-inner {
+    height: 138px;
+  }
+
+  .bubu-basket-slot {
+    height: 26px;
+    font-size: 1.45rem;
+  }
+}
+/* ===== BOTTOM BUBU LAYOUT ===== */
+
+.bubu-sort-bubu,
+.bubu-sort-message img {
+  position: absolute !important;
+  right: -20px !important;
+  bottom: -140px !important;
+
+  width: 145px !important;
+  height: 145px !important;
+
+  left: auto !important;
+  top: auto !important;
+  z-index: 30 !important;
+}
+
+.bubu-sort-message {
+  position: absolute !important;
+
+  right: 30px !important;
+  bottom: 167px !important;
+
+  left: auto !important;
+  top: auto !important;
+
+  width: 180px !important;
+  min-height: auto !important;
+
+  padding: 12px 16px !important;
+
+  text-align: center !important;
+
+  z-index: 31 !important;
+}
+
+.bubu-sort-message::after {
+  display: none !important;
+}
+/* ===== Move top UI down ===== */
+
+.bubu-sort-top {
+  top: 48px !important;
+}
+
+.bubu-sort-title {
+  top: 56px !important;
+}
+/* ===== FORCE BUBU PANTRY BACKGROUND ===== */
+
+.bubu-sort-panel {
+  background-image: url("/games/bubu/bubu-pantry-bg.png") !important;
+  background-size: cover !important;
+  background-position: center center !important;
+  background-repeat: no-repeat !important;
+}
+/* Center the X inside the close button */
+
+.bubu-sort-close {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+
+  padding: 0 !important;
+  line-height: 1 !important;
+
+  font-size: 26px !important;
+  font-weight: 900 !important;
+
+  color: #fff !important;
+}
