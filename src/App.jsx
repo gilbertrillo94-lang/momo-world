@@ -4919,10 +4919,7 @@ return (
 
               
 
-              <div className="danger-zone">
-                <button onClick={() => setConfirmReset(!confirmReset)}>Reset save</button>
-                {confirmReset && <button className="danger" onClick={hardReset}>Confirm reset</button>}
-              </div>
+             
             </Overlay>
           )}
 
