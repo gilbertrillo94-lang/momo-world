@@ -896,6 +896,17 @@ function getMemoryPreviewTime(level) {
 }
 
 const DREAM_SIZE = 6;
+function getDreamGoal(level) {
+  if (level <= 5) {
+    return 1000 + level * 500;
+  }
+
+  return 3500 + (level - 5) * 300;
+}
+
+function getDreamMoves(level) {
+  return 15 + Math.floor((level - 1) / 5) * 2;
+}
 const DREAM_ICONS = [
   { type: "moon", src: "/assets/dream-match/lulu.png" },
   { type: "star", src: "/assets/dream-match/kiki.png" },
@@ -1069,8 +1080,9 @@ export default function App() {
   const [dreamLevel, setDreamLevel] = useState(
     saved?.dreamLevel || 1
   );
-  const dreamGoal = 1500 + (dreamLevel - 1) * 700;
-  const [dreamMoves, setDreamMoves] = useState(15);
+  const dreamGoal = getDreamGoal(dreamLevel);
+  const dreamStartingMoves = getDreamMoves(dreamLevel);
+  const [dreamMoves, setDreamMoves] = useState(dreamStartingMoves);
   const [dreamWon, setDreamWon] = useState(false);
   const [dreamGameOver, setDreamGameOver] = useState(false);
   const [dreamRewardClaimed, setDreamRewardClaimed] = useState(false);
@@ -2640,7 +2652,7 @@ function nextSweetLevel() {
   setDreamChain([]);
   setDreamDragging(false);
   setDreamScore(0);
-  setDreamMoves(15);
+  setDreamMoves(getDreamMoves(dreamLevel));
   setDreamWon(false);
   setDreamGameOver(false);
   setDreamRewardClaimed(false);
@@ -2657,7 +2669,7 @@ function nextDreamLevel() {
   setDreamDragging(false);
 
   setDreamScore(0);
-  setDreamMoves(15);
+  setDreamMoves(getDreamMoves(dreamLevel + 1));
 
   setDreamWon(false);
   setDreamGameOver(false);
