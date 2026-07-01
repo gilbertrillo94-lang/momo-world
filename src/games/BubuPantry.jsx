@@ -218,8 +218,8 @@ export default function BubuPantry({ onClose, onReward }) {  const [level, setLe
     if (isLevelComplete(next)) {
       const finalStars = getStars(nextMoves, config);
 
-            const rewardSparks =
-        finalStars === 3 ? 35 : finalStars === 2 ? 25 : 10;
+      const rewardSparks =
+        finalStars === 3 ? 31 : finalStars === 2 ? 24 : 17;
 
       const rewardBond =
         finalStars === 3 ? 6 : finalStars === 2 ? 4 : 2;
@@ -231,7 +231,7 @@ export default function BubuPantry({ onClose, onReward }) {  const [level, setLe
         stars: finalStars,
         level,
       });
-      
+
       saveBestResult(level, finalStars, nextMoves);
       setProgress(getSavedProgress());
       setWon(true);
@@ -329,9 +329,14 @@ export default function BubuPantry({ onClose, onReward }) {  const [level, setLe
         </div>
 
         <div className="bubu-sort-message">
-          <img src="/characters/bubu/happy.png" alt="Bubu" />
-          <p>{message}</p>
+  <p>{message}</p>
         </div>
+
+        <img
+        className="bubu-sort-bubu"
+        src="/characters/bubu/happy.png"
+        alt="Bubu"
+        />
 
         {won && (
           <div className="bubu-sort-result">

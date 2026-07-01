@@ -1134,8 +1134,17 @@ export default function App() {
           return moved.filter((item) => item.id !== reachedKiki.id);
         }
 
+        const newBest = trailScore > trailBest;
+
         setTrailGameOver(true);
-        setTrailBest((best) => Math.max(best, trailScore));
+
+        if (newBest) {
+          setTrailBest(trailScore);
+          setSparks((s) => s + 40);
+        } else {
+  const reward = Math.min(20, 5 + Math.floor(trailScore / 100));
+  setSparks((s) => s + reward);
+}
       }
 
       const hasTopItem = moved.some((item) => item.y < 18);
@@ -1263,7 +1272,7 @@ const [activeRooms, setActiveRooms] = useState(() => {
   reveal: true,
   moves: 0,
   level: saved?.memoryLevel || 1,
-  triesLeft: 3,
+  triesLeft: 4,
   finished: false,
   failed: false,
   rewardClaimed: false,
@@ -1738,7 +1747,7 @@ function startMemoryGame(levelOverride = memoryGame.level) {
     reveal: true,
     moves: 0,
     level,
-    triesLeft: 3,
+    triesLeft: 4,
     finished: false,
     failed: false,
     rewardClaimed: false,
@@ -1818,15 +1827,17 @@ function pressMemoryCard(card) {
     }));
 
     if (nextTries <= 0) {
-      setMomoMood("Nini is resting");
-    }
+  setSparks((s) => s + 5);
+  setMomoMood("Nini is resting");
+  showPop("+10 ✨");
+}
   }, 650);
 }
 
 function claimMemoryReward() {
   if (memoryGame.rewardClaimed || !memoryGame.finished || memoryGame.failed) return;
 
-  const reward = 20 + memoryGame.level * 5;
+  const reward = Math.min(50, 15 + memoryGame.level * 5);
 
   setSparks((s) => s + reward);
   setBondPoints((b) => b + 3);
@@ -4352,7 +4363,7 @@ const visitRoomBg =
 
      
       <div className="memory-hearts-pill">
-        {Array.from({ length: 3 }).map((_, index) => (
+        {Array.from({ length: 4 }).map((_, index) => (
           <span key={index} className={index < memoryGame.triesLeft ? "" : "empty"}>
             ❤️
           </span>
@@ -4547,7 +4558,11 @@ const visitRoomBg =
                       <h2>☁️ Oops!</h2>
                       <p>Score: {trailScore}</p>
                       <p>🏆 Best: {Math.max(trailBest, trailScore)}</p>
-                      <p>+{Math.floor(trailScore / 2)} ✨ Sparks</p>
+                      <p>
+                        {trailScore > trailBest
+  ? "+40 ✨ New High Score!"
+  : `+${Math.min(20, 5 + Math.floor(trailScore / 100))} ✨ Sparks`}
+                      </p>
                       <p>+{Math.max(1, Math.floor(trailScore / 5))} Bond</p>
 
                       <button
