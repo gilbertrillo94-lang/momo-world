@@ -96,6 +96,8 @@ button {
   font-weight: 800;
 }
 
+
+
 /* Quiz / Story / Reveal */
 
 .quiz-card,
@@ -6929,4 +6931,21 @@ left: -4px;
   border: 0 !important;
   background: transparent !important;
   padding: 0 !important;
+}
+/* FIX QUIZ PHONE CARD COLOR */
+.app.quiz-bg .phone-shell {
+  background: rgba(10, 6, 20, 0.72) !important;
+  border: 1px solid rgba(255, 255, 210, 0.95) !important;
+  box-shadow:
+    0 30px 90px rgba(10, 6, 20, 0.55),
+    inset 0 0 0 1px rgba(255, 255, 210, 0.35) !important;
+}
+
+.app.quiz-bg .quiz-card h1,
+.app.quiz-bg .quiz-count {
+  color: #f4d7ef !important;
+}
+
+.app.quiz-bg .eyebrow {
+  color: #fff8d7 !important;
 }

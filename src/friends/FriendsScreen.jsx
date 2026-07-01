@@ -58,7 +58,7 @@ export default function FriendsScreen({
       if (userSnap.exists()) {
         const data = userSnap.data();
         setProfile(data);
-        setUsernameInput(data.username || displayName || "New Friend");
+        setUsernameInput(data.playerName || data.username || displayName || "New Friend");
       }
     }
 
@@ -79,7 +79,8 @@ export default function FriendsScreen({
     await setDoc(
       doc(db, "users", user.uid),
       {
-        username: cleanName,
+        playerName: cleanName,
+username: cleanName,
         lastSeen: Date.now(),
       },
       { merge: true }
@@ -185,10 +186,10 @@ async function sendFriendRequest() {
     {
       fromUid: user.uid,
       toUid: foundFriend.uid,
-      fromUsername: profile.username || "New Friend",
+      fromUsername: profile.playerName || profile.username || "New Friend",
       fromFriendCode: profile.friendCode,
       fromMomoType: profile.momoType || momo || "Momo",
-      toUsername: foundFriend.username || "New Friend",
+      toUsername: foundFriend.playerName || foundFriend.username || "New Friend",
       toFriendCode: foundFriend.friendCode,
       status: "pending",
       createdAt: Date.now(),
@@ -214,7 +215,7 @@ async function sendFriendRequest() {
 
         <p className="tiny-label">My Momo Profile</p>
 
-        <h3>{profile?.username || "New Friend"}</h3>
+        <h3>{profile?.playerName || profile?.username || "New Friend"}</h3>
 
         <button
         className={`friends-code-box ${copied ? "copied" : ""}`}
@@ -280,7 +281,7 @@ async function sendFriendRequest() {
 
   {foundFriend && (
     <div className="friends-found-card">
-      <strong>{foundFriend.username || "New Friend"}</strong>
+      <strong>{foundFriend.playerName || foundFriend.username || "New Friend"}</strong>
       <span>{foundFriend.friendCode}</span>
       <small>{foundFriend.momoType || "Momo"} Companion</small>
 
@@ -307,7 +308,7 @@ async function sendFriendRequest() {
         />
 
         <div>
-          <strong>{friend.username || "New Friend"}</strong>
+          <strong>{friend.playerName || friend.username || "New Friend"}</strong>
           <span>{friend.friendCode}</span>
           <small>{friend.momoType || "Momo"} Companion</small>
         </div>

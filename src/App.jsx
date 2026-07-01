@@ -16,7 +16,8 @@ import {
 import FriendsScreen from "./friends/FriendsScreen";
 import BubuPantry from "./games/BubuPantry";
 
-const SAVE_KEY = "momo-save-v8";
+const SAVE_KEY = "momo-save-v101";
+const PROFILE_VERSION = "1.0.1";
 
 const CHARACTER_FOLDER = {
   Momo: "momo",
@@ -133,75 +134,108 @@ const MOMO_TYPES = {
 
 const QUIZ = [
   {
-    q: "Your perfect weekend is...",
+    q: "Your perfect weekend feels like...",
     a: [
-      { text: "Spending time with friends", type: "Momo" },
-      { text: "Eating and relaxing", type: "Bubu" },
-      { text: "Going on an adventure", type: "Kiki" },
-      { text: "Creating something meaningful", type: "Lulu" },
-      { text: "Working toward a goal", type: "Riko" },
-      { text: "Helping someone you care about", type: "Nini" },
+      { text: "Laughing with people I love", type: "Momo" },
+      { text: "Staying cozy with good food", type: "Bubu" },
+      { text: "Going somewhere new", type: "Kiki" },
+      { text: "Making something meaningful", type: "Lulu" },
+      { text: "Finishing something I’m proud of", type: "Riko" },
+      { text: "Resting somewhere peaceful", type: "Nini" },
     ],
   },
   {
-    q: "People describe you as...",
+    q: "People usually come to you when they need...",
     a: [
-      { text: "Positive", type: "Momo" },
-      { text: "Comforting", type: "Bubu" },
-      { text: "Energetic", type: "Kiki" },
-      { text: "Creative", type: "Lulu" },
-      { text: "Determined", type: "Riko" },
-      { text: "Gentle", type: "Nini" },
+      { text: "A mood boost", type: "Momo" },
+      { text: "Comfort", type: "Bubu" },
+      { text: "Excitement", type: "Kiki" },
+      { text: "Advice with heart", type: "Lulu" },
+      { text: "A plan", type: "Riko" },
+      { text: "Someone gentle", type: "Nini" },
     ],
   },
   {
-    q: "Choose a dream home.",
+    q: "Choose your dream room vibe.",
     a: [
-      { text: "A lively neighborhood", type: "Momo" },
-      { text: "A cozy cabin", type: "Bubu" },
-      { text: "A treehouse", type: "Kiki" },
-      { text: "A cottage filled with books", type: "Lulu" },
-      { text: "A modern city loft", type: "Riko" },
-      { text: "A peaceful garden home", type: "Nini" },
+      { text: "Bright and cheerful", type: "Momo" },
+      { text: "Soft blankets everywhere", type: "Bubu" },
+      { text: "Full of little surprises", type: "Kiki" },
+      { text: "Books, art, and memories", type: "Lulu" },
+      { text: "Clean, stylish, and focused", type: "Riko" },
+      { text: "Calm, warm, and quiet", type: "Nini" },
     ],
   },
   {
-    q: "When you're stressed, you...",
+    q: "When life gets stressful, you usually...",
     a: [
-      { text: "Talk with someone", type: "Momo" },
-      { text: "Take a nap", type: "Bubu" },
-      { text: "Do something exciting", type: "Kiki" },
-      { text: "Reflect quietly", type: "Lulu" },
-      { text: "Push through it", type: "Riko" },
-      { text: "Give yourself time to heal", type: "Nini" },
+      { text: "Talk it out", type: "Momo" },
+      { text: "Take a break", type: "Bubu" },
+      { text: "Distract yourself with something fun", type: "Kiki" },
+      { text: "Think deeply about it", type: "Lulu" },
+      { text: "Push through", type: "Riko" },
+      { text: "Give yourself time", type: "Nini" },
     ],
   },
   {
-    q: "Pick a hobby.",
+    q: "Pick a small joy.",
     a: [
-      { text: "Hosting gatherings", type: "Momo" },
-      { text: "Trying new food", type: "Bubu" },
-      { text: "Exploring places", type: "Kiki" },
-      { text: "Photography", type: "Lulu" },
-      { text: "Fitness and goals", type: "Riko" },
-      { text: "Gardening", type: "Nini" },
+      { text: "A cute message from a friend", type: "Momo" },
+      { text: "A warm snack", type: "Bubu" },
+      { text: "A spontaneous plan", type: "Kiki" },
+      { text: "A photo worth keeping", type: "Lulu" },
+      { text: "Checking something off your list", type: "Riko" },
+      { text: "A quiet sunset", type: "Nini" },
     ],
   },
   {
-    q: "Your ideal superpower is...",
+    q: "Your ideal companion would be...",
     a: [
-      { text: "Making everyone smile", type: "Momo" },
-      { text: "Creating endless snacks", type: "Bubu" },
-      { text: "Teleporting anywhere", type: "Kiki" },
-      { text: "Preserving memories forever", type: "Lulu" },
-      { text: "Unlimited determination", type: "Riko" },
-      { text: "Healing hearts", type: "Nini" },
+      { text: "A cheerful best friend", type: "Momo" },
+      { text: "A cozy cuddle buddy", type: "Bubu" },
+      { text: "A tiny adventure partner", type: "Kiki" },
+      { text: "A dreamy memory keeper", type: "Lulu" },
+      { text: "A goal-chasing teammate", type: "Riko" },
+      { text: "A gentle little soul", type: "Nini" },
+    ],
+  },
+  {
+    q: "Pick your energy.",
+    a: [
+      { text: "Warm and friendly", type: "Momo" },
+      { text: "Relaxed and cozy", type: "Bubu" },
+      { text: "Fast and curious", type: "Kiki" },
+      { text: "Soft and creative", type: "Lulu" },
+      { text: "Bold and focused", type: "Riko" },
+      { text: "Calm and caring", type: "Nini" },
+    ],
+  },
+  {
+    q: "If your friend had a bad day, you would...",
+    a: [
+      { text: "Make them laugh", type: "Momo" },
+      { text: "Bring them food", type: "Bubu" },
+      { text: "Take them somewhere fun", type: "Kiki" },
+      { text: "Listen to every detail", type: "Lulu" },
+      { text: "Help fix the problem", type: "Riko" },
+      { text: "Sit with them quietly", type: "Nini" },
+    ],
+  },
+  {
+    q: "Choose a weather mood.",
+    a: [
+      { text: "Sunny morning", type: "Momo" },
+      { text: "Rainy blanket day", type: "Bubu" },
+      { text: "Windy exploring weather", type: "Kiki" },
+      { text: "Golden evening", type: "Lulu" },
+      { text: "Crisp clear air", type: "Riko" },
+      { text: "Gentle snowfall", type: "Nini" },
     ],
   },
   {
     q: "What motivates you most?",
     a: [
-      { text: "Relationships", type: "Momo" },
+      { text: "Connection", type: "Momo" },
       { text: "Comfort", type: "Bubu" },
       { text: "Curiosity", type: "Kiki" },
       { text: "Meaning", type: "Lulu" },
@@ -210,36 +244,91 @@ const QUIZ = [
     ],
   },
   {
-    q: "Pick a weather.",
+    q: "Pick a magical ability.",
     a: [
-      { text: "Sunny", type: "Momo" },
-      { text: "Cozy rainy day", type: "Bubu" },
-      { text: "Windy adventure weather", type: "Kiki" },
-      { text: "Golden autumn evening", type: "Lulu" },
-      { text: "Crisp morning air", type: "Riko" },
-      { text: "Gentle snowfall", type: "Nini" },
+      { text: "Making people smile", type: "Momo" },
+      { text: "Creating endless snacks", type: "Bubu" },
+      { text: "Teleporting anywhere", type: "Kiki" },
+      { text: "Saving memories forever", type: "Lulu" },
+      { text: "Never giving up", type: "Riko" },
+      { text: "Healing hearts", type: "Nini" },
     ],
   },
   {
-    q: "Your friend needs help. You...",
+    q: "Your room would probably have...",
     a: [
-      { text: "Cheer them up", type: "Momo" },
-      { text: "Bring comfort food", type: "Bubu" },
-      { text: "Take them somewhere fun", type: "Kiki" },
-      { text: "Listen carefully", type: "Lulu" },
-      { text: "Help solve the problem", type: "Riko" },
-      { text: "Stay beside them", type: "Nini" },
+      { text: "Photos with friends", type: "Momo" },
+      { text: "Pillows and snacks", type: "Bubu" },
+      { text: "Maps and random treasures", type: "Kiki" },
+      { text: "Journals and art", type: "Lulu" },
+      { text: "A clean desk setup", type: "Riko" },
+      { text: "Soft lights and plants", type: "Nini" },
     ],
   },
   {
-    q: "What kind of companion do you want?",
+    q: "Pick a phrase.",
     a: [
-      { text: "A cheerful best friend", type: "Momo" },
-      { text: "A cozy cuddle buddy", type: "Bubu" },
-      { text: "A little adventure partner", type: "Kiki" },
-      { text: "A memory keeper", type: "Lulu" },
-      { text: "A goal-chasing teammate", type: "Riko" },
-      { text: "A gentle soul", type: "Nini" },
+      { text: "Let’s make today happy.", type: "Momo" },
+      { text: "Let’s take it slow.", type: "Bubu" },
+      { text: "Let’s go see what happens.", type: "Kiki" },
+      { text: "Let’s remember this.", type: "Lulu" },
+      { text: "Let’s get it done.", type: "Riko" },
+      { text: "Let’s be gentle with ourselves.", type: "Nini" },
+    ],
+  },
+  {
+    q: "In a group, you are usually the one who...",
+    a: [
+      { text: "Keeps the mood happy", type: "Momo" },
+      { text: "Makes everyone comfortable", type: "Bubu" },
+      { text: "Suggests something fun", type: "Kiki" },
+      { text: "Notices the little moments", type: "Lulu" },
+      { text: "Gets everyone organized", type: "Riko" },
+      { text: "Checks if everyone is okay", type: "Nini" },
+    ],
+  },
+  {
+    q: "Choose a gift.",
+    a: [
+      { text: "A friendship charm", type: "Momo" },
+      { text: "A dessert box", type: "Bubu" },
+      { text: "A mystery ticket", type: "Kiki" },
+      { text: "A handmade scrapbook", type: "Lulu" },
+      { text: "A useful planner", type: "Riko" },
+      { text: "A handwritten letter", type: "Nini" },
+    ],
+  },
+  {
+    q: "What kind of story do you like most?",
+    a: [
+      { text: "Wholesome friendship", type: "Momo" },
+      { text: "Cozy slice of life", type: "Bubu" },
+      { text: "Adventure and discovery", type: "Kiki" },
+      { text: "Dreamy emotional stories", type: "Lulu" },
+      { text: "Underdog success stories", type: "Riko" },
+      { text: "Soft healing stories", type: "Nini" },
+    ],
+  },
+  {
+    q: "Pick your pace.",
+    a: [
+      { text: "Social and bright", type: "Momo" },
+      { text: "Slow and cozy", type: "Bubu" },
+      { text: "Quick and spontaneous", type: "Kiki" },
+      { text: "Thoughtful and creative", type: "Lulu" },
+      { text: "Focused and determined", type: "Riko" },
+      { text: "Quiet and steady", type: "Nini" },
+    ],
+  },
+  {
+    q: "At the end of the day, you want to feel...",
+    a: [
+      { text: "Loved", type: "Momo" },
+      { text: "Comforted", type: "Bubu" },
+      { text: "Alive", type: "Kiki" },
+      { text: "Inspired", type: "Lulu" },
+      { text: "Proud", type: "Riko" },
+      { text: "At peace", type: "Nini" },
     ],
   },
 ];
@@ -848,8 +937,18 @@ function getDreamIndex(row, col) {
 
 function loadSave() {
   try {
-    return JSON.parse(localStorage.getItem(SAVE_KEY));
+    const saved = JSON.parse(localStorage.getItem(SAVE_KEY) || "null");
+
+    if (saved && saved.profileVersion !== PROFILE_VERSION) {
+      localStorage.removeItem(SAVE_KEY);
+      localStorage.removeItem("momo_bubu_progress");
+      localStorage.removeItem("momo_bubu_level");
+      return null;
+    }
+
+    return saved;
   } catch {
+    localStorage.removeItem(SAVE_KEY);
     return null;
   }
 }
@@ -946,7 +1045,10 @@ export default function App() {
   () => LOADING_TIPS[Math.floor(Math.random() * LOADING_TIPS.length)]
 );
   const [transitionLoading, setTransitionLoading] = useState(null); 
-  const [screen, setScreen] = useState(saved?.momo ? "home" : "front");
+  const [screen, setScreen] = useState(() => {
+  if (saved?.momo && saved?.playerName) return "home";
+  return "front";
+});
   const [sideMenuOpen, setSideMenuOpen] = useState(false);
   const [showArcade, setShowArcade] = useState(false);
   const [previewWallpaper, setPreviewWallpaper] = useState(null);
@@ -1065,6 +1167,8 @@ export default function App() {
   const [momo, setMomo] = useState(saved?.momo || null);
   const [shuffledAnswers, setShuffledAnswers] = useState([]);
   const [customName, setCustomName] = useState(saved?.customName || "");
+  const [playerName, setPlayerName] = useState(saved?.playerName || "");
+const [playerNameInput, setPlayerNameInput] = useState(saved?.playerName || "");
   const [customVibe, setCustomVibe] = useState(saved?.customVibe || "soft");
   const [nameInput, setNameInput] = useState(saved?.customName || "");
   const [vibeInput, setVibeInput] = useState(saved?.customVibe || "soft");
@@ -1211,50 +1315,59 @@ useEffect(() => {
     const userSnap = await getDoc(userRef);
 
     if (!userSnap.exists()) {
-      await setDoc(userRef, {
-        uid: user.uid,
-        friendCode: createFriendCode(),
-        username: "New Friend",
+  await setDoc(userRef, {
+    uid: user.uid,
+    friendCode: createFriendCode(),
+    playerName: playerName || "New Friend",
+    username: playerName || "New Friend",
+    profileVersion: PROFILE_VERSION,
+    momoType: momo || "Momo",
+    customName: customName || "",
+    roomIndex: roomIndex || 0,
+    bondPoints: bondPoints || 0,
+    publicWorld: {
+      playerName: playerName || "New Friend",
+      username: playerName || "New Friend",
+      momoType: momo || "Momo",
+      customName: customName || "",
+      roomIndex: roomIndex || 0,
+      activeRooms: activeRooms || {},
+      placedItems: placedItems || {},
+      lastSeen: Date.now(),
+    },
+    createdAt: Date.now(),
+    lastSeen: Date.now(),
+  });
+} else {
+  await setDoc(
+    userRef,
+    {
+      playerName: playerName || "New Friend",
+      username: playerName || "New Friend",
+      profileVersion: PROFILE_VERSION,
+      momoType: momo || "Momo",
+      customName: customName || "",
+      roomIndex: roomIndex || 0,
+      bondPoints: bondPoints || 0,
+      publicWorld: {
+        playerName: playerName || "New Friend",
+        username: playerName || "New Friend",
         momoType: momo || "Momo",
         customName: customName || "",
         roomIndex: roomIndex || 0,
-        bondPoints: bondPoints || 0,
-        publicWorld: {
-        momoType: momo || "Momo",
-        customName: customName || "",
-        roomIndex: roomIndex || 0,
-        activeRooms: activeRooms || {},
         placedItems: placedItems || {},
+        activeRooms: activeRooms || {},
         lastSeen: Date.now(),
       },
-        createdAt: Date.now(),
-        lastSeen: Date.now(),
-      });
-    } else {
-      await setDoc(
-        userRef,
-        {
-          momoType: momo || "Momo",
-          customName: customName || "",
-          roomIndex: roomIndex || 0,
-          bondPoints: bondPoints || 0,
-          publicWorld: {
-          momoType: momo || "Momo",
-          customName: customName || "",
-          roomIndex: roomIndex || 0,
-          placedItems: placedItems || {},
-          activeRooms: activeRooms || {},
-          lastSeen: Date.now(),
-          },
-          lastSeen: Date.now(),
-        },
-        { merge: true }
-      );
-    }
+      lastSeen: Date.now(),
+    },
+    { merge: true }
+  );
+}
   });
 
   return () => unsubscribe();
-}, [momo, customName, roomIndex, bondPoints, placedItems, activeRooms]);
+}, [momo, playerName, customName, roomIndex, bondPoints, placedItems, activeRooms]);
 
 
   useEffect(() => {
@@ -1319,8 +1432,10 @@ useEffect(() => {
 
     localStorage.setItem(
       SAVE_KEY,
-      JSON.stringify({
+    JSON.stringify({
+      profileVersion: PROFILE_VERSION,
         momo,
+        playerName,
         customName,
         customVibe,
         sparks,
@@ -1358,7 +1473,8 @@ useEffect(() => {
       })
     );
   }, [
-    momo,
+  momo,
+    playerName,
     customName,
     customVibe,
     sparks,
@@ -1750,7 +1866,10 @@ function nextMemoryLevel() {
     .filter(([type, score]) => score === highestScore)
     .map(([type]) => type);
 
-  const result = tiedResults[Math.floor(Math.random() * tiedResults.length)];
+  const result =
+  tiedResults.length === 1
+    ? tiedResults[0]
+    : tiedResults[(Date.now() + playerName.length) % tiedResults.length];
 
   setMomo(result);
   setScreen("reveal");
@@ -2764,7 +2883,8 @@ async function acceptFriendRequestFromMail(request) {
 
   await setDoc(doc(db, "users", user.uid, "friends", request.fromUid), {
     uid: request.fromUid,
-    username: request.fromUsername || "New Friend",
+    playerName: request.fromUsername || "New Friend",
+username: request.fromUsername || "New Friend",
     friendCode: request.fromFriendCode,
     momoType: request.fromMomoType || "Momo",
     since: now,
@@ -2774,7 +2894,8 @@ console.log("Friend written to current user");
 
   await setDoc(doc(db, "users", request.fromUid, "friends", user.uid), {
     uid: user.uid,
-    username: myProfile.username || "New Friend",
+    playerName: myProfile.playerName || myProfile.username || "New Friend",
+username: myProfile.playerName || myProfile.username || "New Friend",
     friendCode: myProfile.friendCode,
     momoType: myProfile.momoType || validMomo || "Momo",
     since: now,
@@ -3063,7 +3184,7 @@ if (screen === "front") {
                 bgm.play().catch(() => {});
               }
 
-              setScreen("quiz");
+              setScreen("name");
             }}
             aria-label="Start Game"
           />
@@ -3073,6 +3194,55 @@ if (screen === "front") {
     </div>
   );
 }
+
+
+if (screen === "name") {
+  return (
+    <div className="app front-bg">
+      <div className="phone-shell">
+        <div className="story-card">
+          <p className="eyebrow">Welcome to Momo World</p>
+
+          <h1>What should your friends call you?</h1>
+
+          <p>
+            This is the name your friends will see in Momo World.
+          </p>
+
+          <input
+            value={playerNameInput}
+            onChange={(e) => setPlayerNameInput(e.target.value)}
+            placeholder="Enter your name"
+            maxLength={16}
+          />
+
+          <button
+            className="primary-btn"
+            disabled={!playerNameInput.trim()}
+            onClick={() => {
+  const name = playerNameInput.trim();
+
+  setPlayerName(name);
+
+  localStorage.setItem(
+    SAVE_KEY,
+    JSON.stringify({
+      ...loadSave(),
+      playerName: name,
+    })
+  );
+
+  setScreen("quiz");
+}}
+          >
+            Continue
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 
   if (screen === "quiz") {
     const current = QUIZ[quizIndex];
