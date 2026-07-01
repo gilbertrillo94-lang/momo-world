@@ -236,15 +236,13 @@ export default function BubuPantry({ onClose, onReward }) {  const [level, setLe
       setProgress(getSavedProgress());
       setWon(true);
 
-      if (finalStars === 3) {
-        setMessage("Perfect pantry! Bubu is amazed! ⭐⭐⭐");
-      } else if (finalStars === 2) {
-        setMessage("Great job! Next pantry unlocked! ⭐⭐");
-      } else {
-        setMessage(
-          "Pantry organized! Try for 2 stars to unlock the next level. ⭐"
-        );
-      }
+     if (finalStars === 3) {
+  setMessage("Perfect pantry! +31 ✨ +6 ❤️ ⭐⭐⭐");
+} else if (finalStars === 2) {
+  setMessage("Great job! +24 ✨ +4 ❤️ ⭐⭐");
+} else {
+  setMessage("Pantry organized! +17 ✨ +2 ❤️ ⭐");
+}
 
       return;
     }

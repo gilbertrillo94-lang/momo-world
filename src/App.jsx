@@ -2642,12 +2642,21 @@ setTimeout(() => {
   setSweetJudgement("");
 }, 800);
 
-  if (nextAttempt >= SWEET_DESSERTS.length - 1) {
-    const won = nextScore >= sweetGoal;
-    setSweetWon(won);
-    setSweetGameOver(true);
-    setSweetMessage(won ? "Bakery Level Complete!" : "So close! Try again.");
+ if (nextAttempt >= SWEET_DESSERTS.length - 1) {
+  const won = nextScore >= sweetGoal;
+
+  setSweetWon(won);
+  setSweetGameOver(true);
+
+  if (won) {
+    setSweetMessage("Bakery Level Complete! Claim +25 ✨ +5 ❤️");
+  } else {
+    setSweetMessage("So close! You still earned +5 ✨ +1 ❤️");
+    setSparks((s) => s + 5);
+    setBondPoints((b) => b + 1);
+    showPop("+5 ✨ +1 ❤️");
   }
+}
 }
 
 function nextSweetLevel() {
@@ -4490,7 +4499,14 @@ const visitRoomBg =
 
 
                 {activeGame === "bubu-pantry" && (
-  <BubuPantry onClose={() => setActiveGame(null)} />
+  <BubuPantry
+  onClose={() => setActiveGame(null)}
+  onReward={({ sparks, bond }) => {
+    setSparks((s) => s + sparks);
+    setBondPoints((b) => b + bond);
+    showPop(`+${sparks} ✨`);
+  }}
+/>
 )}
 
 
