@@ -734,11 +734,10 @@
 }
 /* ===== BOTTOM BUBU LAYOUT ===== */
 
-.bubu-sort-bubu,
-.bubu-sort-message img {
+.bubu-sort-bubu {
   position: absolute !important;
-  right: -20px !important;
-  bottom: -140px !important;
+  right: 18px !important;
+  bottom: 18px !important;
 
   width: 145px !important;
   height: 145px !important;
@@ -746,6 +745,9 @@
   left: auto !important;
   top: auto !important;
   z-index: 30 !important;
+
+  object-fit: contain !important;
+  pointer-events: none !important;
 }
 
 .bubu-sort-message {

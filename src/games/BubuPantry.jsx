@@ -8,8 +8,8 @@ const PROGRESS_KEY = "momo_bubu_progress";
 const LEVELS = [
   {
     level: 1,
-    twoStarMoves: 17,
-    threeStarMoves: 12,
+    twoStarMoves: 12,
+    threeStarMoves: 8,
     types: [
       { id: "apple", icon: "🍎" },
       { id: "milk", icon: "🥛" },
@@ -19,8 +19,8 @@ const LEVELS = [
   },
   {
     level: 2,
-    twoStarMoves: 23,
-    threeStarMoves: 17,
+    twoStarMoves: 16,
+    threeStarMoves: 12,
     types: [
       { id: "apple", icon: "🍎" },
       { id: "milk", icon: "🥛" },
@@ -31,8 +31,8 @@ const LEVELS = [
   },
   {
     level: 3,
-    twoStarMoves: 31,
-    threeStarMoves: 23,
+    twoStarMoves: 22,
+    threeStarMoves: 16,
     types: [
       { id: "apple", icon: "🍎" },
       { id: "milk", icon: "🥛" },

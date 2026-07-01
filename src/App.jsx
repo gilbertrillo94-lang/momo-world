@@ -1112,9 +1112,18 @@ export default function App() {
   const [landingLayer, setLandingLayer] = useState(null);
 
 
-  const sweetGoal = Math.min(1200, 600 + (sweetLevel - 1) * 250);
-  const [slotSpinning, setSlotSpinning] = useState(false);
-  const [slotReels, setSlotReels] = useState([
+ const SWEET_GOALS = [
+  600, 850, 1100, 1300, 1450,
+  1600, 1725, 1850, 1950, 2050,
+  2125, 2200, 2250, 2300, 2350,
+  2380, 2400, 2420, 2440, 2450,
+];
+
+const sweetGoal =
+  SWEET_GOALS[Math.min(sweetLevel - 1, SWEET_GOALS.length - 1)];
+
+const [slotSpinning, setSlotSpinning] = useState(false);
+const [slotReels, setSlotReels] = useState([
   { id: "moon", img: "/assets/slots/moon.png", payout: 1000 },
   { id: "star", img: "/assets/slots/star.png", payout: 50 },
   { id: "cloud", img: "/assets/slots/cloud.png", payout: 5 },
@@ -2561,9 +2570,9 @@ function resetSweetStack() {
 }
 
 function getSweetMultiplier(combo) {
-  if (combo >= 12) return 4;
-  if (combo >= 6) return 3;
-  if (combo >= 3) return 2;
+  if (combo >= 8) return 5;
+  if (combo >= 6) return 4;
+  if (combo >= 3) return 3;
   return 1;
 }
 
@@ -3717,6 +3726,8 @@ const visitRoomBg =
               </span>
 
               </button>
+
+              
           </section>
 
           <div className="visit-actions">
