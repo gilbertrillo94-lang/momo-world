@@ -1827,7 +1827,7 @@ function pressMemoryCard(card) {
     }));
 
     if (nextTries <= 0) {
-  setSparks((s) => s + 5);
+  setSparks((s) => s + 10);
   setMomoMood("Nini is resting");
   showPop("+10 ✨");
 }
