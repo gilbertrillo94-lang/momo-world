@@ -1,11 +1,18 @@
 .bubu-sort-overlay {
-  position: fixed;
-  inset: 0;
-  z-index: 999999;
-  display: grid;
-  place-items: center;
-  background: rgba(22, 10, 30, 0.52);
-  backdrop-filter: blur(8px);
+  position: fixed !important;
+  inset: 0 !important;
+
+  width: 100vw !important;
+  height: 100dvh !important;
+
+  z-index: 999999 !important;
+
+  display: block !important;
+
+  background: #120d19 !important;
+  backdrop-filter: none !important;
+
+  overflow: hidden !important;
 }
 
 .bubu-sort-panel {
@@ -284,10 +291,17 @@
 
 .bubu-sort-panel {
   position: relative;
-  width: min(94vw, 430px);
-  height: min(92dvh, 820px);
+
+  width: 100vw !important;
+  height: 100dvh !important;
+
+  max-width: none !important;
+  max-height: none !important;
+
   overflow: hidden;
-  border-radius: 34px;
+
+  border-radius: 0 !important;
+
   background:
     radial-gradient(circle at 50% 8%, rgba(255, 255, 255, .95), transparent 22%),
     linear-gradient(180deg, #ffe4b5 0%, #ffd083 42%, #f3b75f 67%, #91c56b 100%);

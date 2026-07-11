@@ -1,0 +1,110 @@
+.arcade-fullscreen {
+  position: absolute;
+  inset: 0;
+  z-index: 900;
+  width: 100%;
+  height: 100%;
+  overflow-y: auto;
+  padding: calc(18px + env(safe-area-inset-top)) 18px calc(24px + env(safe-area-inset-bottom));
+  background:
+    radial-gradient(circle at top left, rgba(255, 232, 174, 0.9), transparent 32%),
+    radial-gradient(circle at top right, rgba(255, 179, 222, 0.8), transparent 34%),
+    linear-gradient(180deg, #211634 0%, #3d2a62 45%, #1b263e 100%);
+  color: white;
+}
+
+.arcade-full-top {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 18px;
+}
+
+.arcade-full-top button {
+  border: none;
+  border-radius: 999px;
+  padding: 10px 14px;
+  background: rgba(255,255,255,.16);
+  color: white;
+  font-weight: 1000;
+}
+
+.arcade-full-top h1 {
+  margin: 0;
+  flex: 1;
+  text-align: center;
+  font-size: 28px;
+}
+
+.arcade-full-tabs {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+  padding: 8px;
+  margin-bottom: 18px;
+  border-radius: 999px;
+  background: rgba(255,255,255,.12);
+  backdrop-filter: blur(12px);
+}
+
+.arcade-full-tabs button {
+  border: none;
+  border-radius: 999px;
+  padding: 13px 10px;
+  background: transparent;
+  color: rgba(255,255,255,.72);
+  font-weight: 1000;
+}
+
+.arcade-full-tabs button.active {
+  background: white;
+  color: #5d48d8;
+}
+
+.arcade-full-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 14px;
+}
+
+.arcade-full-card {
+  min-height: 172px;
+  border: none;
+  border-radius: 28px;
+  padding: 12px;
+  background: rgba(255,255,255,.13);
+  color: white;
+  text-align: center;
+  backdrop-filter: blur(12px);
+  box-shadow: 0 16px 30px rgba(0,0,0,.18);
+}
+
+.arcade-full-card img {
+  width: 100%;
+  aspect-ratio: 1 / 1;
+  object-fit: cover;
+  border-radius: 20px;
+  margin-bottom: 10px;
+}
+
+.arcade-full-icon {
+  height: 112px;
+  display: grid;
+  place-items: center;
+  font-size: 54px;
+  border-radius: 20px;
+  margin-bottom: 10px;
+  background: rgba(255,255,255,.12);
+}
+
+.arcade-full-card h3 {
+  margin: 0;
+  font-size: 16px;
+}
+
+.arcade-full-card p {
+  margin: 5px 0 0;
+  font-size: 12px;
+  opacity: .78;
+  font-weight: 800;
+}

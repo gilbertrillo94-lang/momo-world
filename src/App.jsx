@@ -15,6 +15,8 @@ import {
 } from "firebase/firestore";
 import FriendsScreen from "./friends/FriendsScreen";
 import BubuPantry from "./games/BubuPantry";
+import WerewolfGame from "./games/werewolf/WerewolfGame";
+import Arcade from "./screens/Arcade";
 
 const SAVE_KEY = "momo-save-v101";
 const PROFILE_VERSION = "1.0.1";
@@ -1275,6 +1277,7 @@ const [activeRooms, setActiveRooms] = useState(() => {
   const [incomingRequests, setIncomingRequests] = useState([]);
   const [friends, setFriends] = useState([]);
   const [openedPostcard, setOpenedPostcard] = useState(null);
+  const [pendingWerewolfRoomCode, setPendingWerewolfRoomCode] = useState("");
   const [mailTab, setMailTab] = useState("mail");
   const [selectedGiftId, setSelectedGiftId] = useState("");
   const [selectedGiftType, setSelectedGiftType] = useState("");
@@ -1546,23 +1549,10 @@ useEffect(() => {
     }
 
     if (lastVisitDate !== todayKey()) {
-      setStreak((s) => (lastVisitDate === yesterdayKey() ? s + 1 : 1));
-      setLastVisitDate(todayKey());
+  setStreak((s) => (lastVisitDate === yesterdayKey() ? s + 1 : 1));
+  setLastVisitDate(todayKey());
+}
 
-      const auto = AUTONOMOUS_ACTIVITIES[Math.floor(Math.random() * AUTONOMOUS_ACTIVITIES.length)];
-      setMailbox((m) => [
-        {
-          id: Date.now(),
-          date: todayKey(),
-          read: false,
-          text:
-            lastVisitDate === yesterdayKey()
-              ? `You came back again. While you were away, ${displayName} was ${auto.text.toLowerCase()}.`
-              : `I missed you while you were gone. I kept a tiny spark safe for you.`,
-        },
-        ...m,
-      ].slice(0, 20));
-    }
   }, [momo, questDate, lastVisitDate, displayName]);
 
   useEffect(() => {
@@ -3021,6 +3011,18 @@ if (postcard.gift.type === "wallpaper") {
   showPop(`Gift claimed! ${postcard.gift.name}`);
 }
 
+function acceptMoonVillageInvite(postcard) {
+  if (!postcard.roomCode) {
+    showPop("Missing room code");
+    return;
+  }
+
+  setOpenedPostcard(null);
+  setScreen("werewolf");
+  setShowArcade(false);
+  setPendingWerewolfRoomCode(postcard.roomCode);
+}
+
 async function openPostcard(postcard) {
   setOpenedPostcard({
     ...postcard,
@@ -4079,141 +4081,56 @@ const visitRoomBg =
           )}
 
 {showArcade && (
-  <div className="arcade-overlay">
-    <div className="arcade-panel">
+  <Arcade
+    onClose={() => setShowArcade(false)}
+    stats={{
+      dreamBest,
+      trailBest,
+      bubuBest,
+      sweetBest,
+      miniGameHighScore,
+    }}
+    onOpenOfflineGame={(gameId) => {
+      setScreen("home");
 
-      <button
-        className="arcade-close"
-        onClick={() => setShowArcade(false)}
-      >
-        ×
-      </button>
+      if (gameId === "dream-match") {
+        resetDreamMatch();
+      }
 
-      <h2 className="arcade-title">
-         Momo Arcade
-      </h2>
+      if (gameId === "star-trail") {
+        setTrailScore(0);
+        setTrailLane(1);
+        setTrailItems([]);
+        setTrailGameOver(false);
+      }
 
-      <div className="arcade-grid">
+      if (gameId === "memory-match") {
+        startMemoryGame(memoryGame.level || 1);
+      }
 
-        <button
-          className="arcade-game-card"
-          onClick={() => {
-            resetDreamMatch();
-            setActiveGame("dream-match");
-            setShowArcade(false);
-          }}
-        >
-          <img
-          src="/assets/arcade/dream-catch.png"
-          alt="Lulu's Dream Match"
-          className="arcade-game-img"
-        />
-
-          <h3>Dream Match</h3>
-
-          <p>🏆 Best {dreamBest}</p>
-        </button>
-
-        <button
-        className="arcade-game-card"
-        onClick={() => {
-          setTrailScore(0);
-          setTrailLane(1);
-          setTrailItems([]);
-          setTrailGameOver(false);
-          setActiveGame("star-trail");
-          setShowArcade(false);
-        }}
-      >
-        <img
-          src="/assets/arcade/star-trail.png"
-          alt="Star Trail"
-          className="arcade-game-img"
-        />
-
-        <h3>Star Trail</h3>
-
-        <p>🏆 Best {trailBest}</p>
-        </button>
-
-
-       <button
-        className="arcade-game-card"
-        onClick={() => {
-          setActiveGame("bubu-pantry");
-          setShowArcade(false);
-        }}
-      >
-        <img
-          src="/assets/arcade/bubu-pantry.png"
-          alt="Bubu's Pantry"
-          className="arcade-game-img"
-        />
-
-        <h3>Bubu's Pantry</h3>
-
-        <p>🏆 Best {bubuBest}</p>
-      </button>
-
-
-        <button
-
-
-        className="arcade-game-card"
-        onClick={() => {
-          setActiveGame("sweet-stack");
-          setShowArcade(false);
-        }}
-      >
-        <img
-          src="/assets/arcade/sweet-stack.png"
-          alt="Momo's Sweet Stack"
-          className="arcade-game-img"
-        />
-
-        <h3>Sweet Stack</h3>
-
-        <p>🏆 Best {sweetBest}</p>
-      </button>
-
-      <button
-        className="arcade-game-card"
-        onClick={() => {
-          startMemoryGame(memoryGame.level || 1);
-          setActiveGame("memory-match");
-          setShowArcade(false);
-        }}
-      >
-        <img
-          src="/assets/arcade/memory-match.png"
-          alt="Nini's Moonlight Memories"
-          className="arcade-game-img"
-        />
-
-        <h3>Memories</h3>
-
-        <p>🏆 Best Lv {miniGameHighScore}</p>
-      </button>
-
-        <button className="arcade-game-card">
-          <img
-            src="/assets/arcade/momo-crossing.png"
-            alt="Riko"
-            className="arcade-game-img"
-          />
-
-          <h3>Riko</h3>
-
-          <p>🚧 Coming Soon</p>
-        </button>
-
-             </div>
-    </div>
-  </div>
+      setActiveGame(gameId);
+      setShowArcade(false);
+    }}
+    onOpenOnlineGame={(gameId) => {
+      setActiveGame(null);
+      setScreen(gameId);
+      setShowArcade(false);
+    }}
+  />
 )}
 
-
-
+{screen === "werewolf" && (
+  <WerewolfGame
+  onClose={() => {
+    setPendingWerewolfRoomCode("");
+    setScreen("home");
+    setShowArcade(true);
+  }}
+  displayName={displayName}
+  momo={momo}
+  initialRoomCode={pendingWerewolfRoomCode}
+/>
+)}
 
 {activeGame === "dream-match" && (
   <div className="game-overlay">
@@ -4231,6 +4148,7 @@ const visitRoomBg =
             setActiveGame(null);
             setDreamChain([]);
             setDreamDragging(false);
+            setShowArcade(true);
           }}
         >
           ×
@@ -4351,6 +4269,7 @@ const visitRoomBg =
             onClick={() => {
               setActiveGame(null);
               resetDreamMatch();
+              setShowArcade(true);
             }}
           >
             Quit
@@ -4383,6 +4302,7 @@ const visitRoomBg =
         className="memory-close"
         onClick={() => {
           setActiveGame(null);
+          setShowArcade(true);
           setMemoryGame((game) => ({
             ...game,
             flipped: [],
@@ -4485,6 +4405,7 @@ const visitRoomBg =
           <button
             onClick={() => {
               setActiveGame(null);
+              setShowArcade(true);
             }}
           >
             Quit
@@ -4499,15 +4420,18 @@ const visitRoomBg =
 
 
                 {activeGame === "bubu-pantry" && (
-  <BubuPantry
-  onClose={() => setActiveGame(null)}
-  onReward={({ sparks, bond }) => {
-    setSparks((s) => s + sparks);
-    setBondPoints((b) => b + bond);
-    showPop(`+${sparks} ✨`);
-  }}
-/>
-)}
+                <BubuPantry
+                onClose={() => {
+                  setActiveGame(null);
+                  setShowArcade(true);
+                }}
+                onReward={({ sparks, bond }) => {
+                  setSparks((s) => s + sparks);
+                  setBondPoints((b) => b + bond);
+                  showPop(`+${sparks} ✨`);
+                }}
+              />
+              )}
 
 
 
@@ -4522,6 +4446,7 @@ const visitRoomBg =
                     className="game-close"
                     onClick={() => {
                       setActiveGame(null);
+                      setShowArcade(true);
                       setTrailGameOver(false);
                     }}
                   >
@@ -4618,6 +4543,7 @@ const visitRoomBg =
                       <button
                         onClick={() => {
                           setActiveGame(null);
+                          setShowArcade(true);
                           setTrailGameOver(false);
                         }}
                       >
@@ -4645,6 +4571,7 @@ const visitRoomBg =
         className="game-close sweet-stack-close"
         onClick={() => {
           setActiveGame(null);
+          setShowArcade(true);
           resetSweetStack();
         }}
       >
@@ -4769,6 +4696,7 @@ const visitRoomBg =
           <button
             onClick={() => {
               setActiveGame(null);
+              setShowArcade(true);
               resetSweetStack();
             }}
           >
@@ -4965,7 +4893,9 @@ return (
 
           {receivedPostcards.map((postcard) => (
             <button
-              className="mail-inbox-card"
+              className={`mail-inbox-card ${
+                postcard.type === "moonVillageInvite" ? "moon-invite-mail" : ""
+              }`}
               key={postcard.id}
               onClick={() => openPostcard(postcard)}
             >
@@ -4975,8 +4905,14 @@ return (
             </div>
 
               <div>
-                <span>Postcard</span>
-                <strong>From {postcard.fromUsername || "Friend"}</strong>
+                <span>
+                  {postcard.type === "moonVillageInvite" ? "Moon Village Invite" : "Postcard"}
+                </span>
+                <strong>
+                  {postcard.type === "moonVillageInvite"
+                    ? `${postcard.fromUsername || "Friend"} invited you`
+                    : `From ${postcard.fromUsername || "Friend"}`}
+                </strong>
                 <p>
                   {postcard.message
                     ? postcard.message.slice(0, 42)
@@ -4991,12 +4927,16 @@ return (
                 )}
               </div>
 
-              {postcard.cardImage && (
-                <img
-                  src={postcard.cardImage}
-                  alt=""
-                  className="mail-thumb"
-                />
+              {postcard.type === "moonVillageInvite" ? (
+                <div className="moon-invite-thumb">🌕</div>
+              ) : (
+                postcard.cardImage && (
+                  <img
+                    src={postcard.cardImage}
+                    alt=""
+                    className="mail-thumb"
+                  />
+                )
               )}
             </button>
           ))}
@@ -5080,36 +5020,64 @@ return (
       ×
     </button>
 
-   <div className="postcard-layout postcard-reader-card">
-  <img
-    src={openedPostcard.cardImage}
-    alt="Opened postcard"
-    className="postcard-reader-image"
-  />
+    {openedPostcard.type === "moonVillageInvite" ? (
+      <div className="moon-invite-reader-card">
+        <div className="moon-invite-big">🌕</div>
 
-  <p>{openedPostcard.message}</p>
-</div>
+        <p className="phase-label">Moon Village Invite</p>
 
-{openedPostcard.gift && (
-  <div className="postcard-gift-claim">
-    <p>
-      🎁 {openedPostcard.gift.name}
-    </p>
+        <h2>{openedPostcard.fromUsername || "Friend"} invited you</h2>
 
-    {openedPostcard.gift.claimed ? (
-      <strong>Gift Claimed ✓</strong>
+        <p>
+          Join their Moon Village room and play Werewolf together.
+        </p>
+
+        <div className="moon-invite-code">
+          <span>Room Code</span>
+          <strong>{openedPostcard.roomCode}</strong>
+        </div>
+
+        <button onClick={() => acceptMoonVillageInvite(openedPostcard)}>
+          Join Room
+        </button>
+
+        <small>
+          From {openedPostcard.fromUsername || "Friend"}
+        </small>
+      </div>
     ) : (
-      <button onClick={() => claimPostcardGift(openedPostcard)}>
-        Claim Gift
-      </button>
+      <>
+        <div className="postcard-layout postcard-reader-card">
+          <img
+            src={openedPostcard.cardImage}
+            alt="Opened postcard"
+            className="postcard-reader-image"
+          />
+
+          <p>{openedPostcard.message}</p>
+        </div>
+
+        {openedPostcard.gift && (
+          <div className="postcard-gift-claim">
+            <p>
+              🎁 {openedPostcard.gift.name}
+            </p>
+
+            {openedPostcard.gift.claimed ? (
+              <strong>Gift Claimed ✓</strong>
+            ) : (
+              <button onClick={() => claimPostcardGift(openedPostcard)}>
+                Claim Gift
+              </button>
+            )}
+          </div>
+        )}
+
+        <small>
+          From {openedPostcard.fromUsername || "Friend"}
+        </small>
+      </>
     )}
-  </div>
-)}
-
-
-    <small>
-      From {openedPostcard.fromUsername || "Friend"}
-    </small>
   </div>
 )}
 

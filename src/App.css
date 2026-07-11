@@ -3017,17 +3017,31 @@ body,
 /* ===== SNACK CATCH ===== */
 
 .game-overlay {
-  position: fixed;
-  inset: 0;
+  position: fixed !important;
+  inset: 0 !important;
+  z-index: 2000 !important;
 
-  z-index: 2000;
+  width: 100vw !important;
+  height: 100dvh !important;
 
-  display: flex;
-  justify-content: center;
-  align-items: center;
+  display: block !important;
 
-  background: rgba(0,0,0,.45);
-  backdrop-filter: blur(10px);
+  background: #120d19 !important;
+  backdrop-filter: none !important;
+
+  overflow: hidden !important;
+}
+
+.game-overlay > * {
+  width: 100vw !important;
+  height: 100dvh !important;
+  max-width: none !important;
+  max-height: none !important;
+
+  border-radius: 0 !important;
+  margin: 0 !important;
+
+  box-shadow: none !important;
 }
 
 .game-panel {
@@ -3306,8 +3320,8 @@ background-repeat: no-repeat;
 }
 .trail-game-panel {
   position: relative;
-  width: min(92vw, 390px);
-  height: min(82vh, 680px);
+  width: 100vw !important;
+  height: 100dvh !important;
   border-radius: 32px;
   overflow: hidden;
  background:
@@ -3435,8 +3449,8 @@ background-repeat: no-repeat;
 
 .dream-match-panel {
   position: relative;
-  width: min(96vw, 430px);
-  height: min(92dvh, 820px);
+  width: 100vw !important;
+  height: 100dvh !important;  
   padding: 18px 14px 16px;
   border-radius: 32px;
   overflow: hidden;
@@ -4142,8 +4156,8 @@ background-repeat: no-repeat;
 
 .sweet-stack-panel {
   position: relative;
-  width: min(94vw, 430px);
-  height: min(92dvh, 820px);
+  width: 100vw !important;
+  height: 100dvh !important;
   border-radius: 32px;
   overflow: hidden;
   background: #ffd6e8;
@@ -4403,8 +4417,8 @@ background-repeat: no-repeat;
 
 .memory-match-panel {
   position: relative;
-  width: min(96vw, 430px);
-  height: min(92dvh, 820px);
+  width: 100vw !important;
+  height: 100dvh !important;
   border-radius: 32px;
   overflow: hidden;
   box-shadow:
@@ -6948,4 +6962,155 @@ left: -4px;
 
 .app.quiz-bg .eyebrow {
   color: #fff8d7 !important;
+}
+/* =========================================================
+   DESKTOP PHONE-SHELL FIX FOR ARCADE + GAMES
+   Keeps games inside the phone frame on Mac/Desktop
+   ========================================================= */
+
+@media (min-width: 769px) {
+  .arcade-fullscreen,
+  .werewolf-screen,
+  .game-overlay {
+    position: absolute !important;
+    inset: 0 !important;
+    width: 100% !important;
+    height: 100% !important;
+    min-height: 100% !important;
+    max-width: none !important;
+    max-height: none !important;
+    border-radius: 0 !important;
+    overflow: hidden auto !important;
+  }
+
+  .game-overlay > * {
+    width: 100% !important;
+    height: 100% !important;
+    max-width: none !important;
+    max-height: none !important;
+  }
+
+  .trail-game-panel,
+  .sweet-stack-panel,
+  .dream-match-panel,
+  .memory-match-panel,
+  .snack-game-panel {
+    width: 100% !important;
+    height: 100% !important;
+    max-width: none !important;
+    max-height: none !important;
+    border-radius: 0 !important;
+  }
+}
+
+/* Phone still gets true fullscreen */
+@media (max-width: 768px) {
+  .arcade-fullscreen,
+  .werewolf-screen,
+  .game-overlay {
+    position: fixed !important;
+    inset: 0 !important;
+    width: 100vw !important;
+    height: 100dvh !important;
+    min-height: 100dvh !important;
+  }
+}
+/* MOON VILLAGE INVITE MAIL */
+
+.moon-invite-mail {
+  background:
+    radial-gradient(circle at top left, rgba(255, 232, 174, 0.9), transparent 36%),
+    linear-gradient(135deg, #2b2459, #47306d) !important;
+  color: white !important;
+}
+
+.moon-invite-mail span,
+.moon-invite-mail strong,
+.moon-invite-mail p,
+.moon-invite-mail small {
+  color: white !important;
+}
+
+.moon-invite-thumb {
+  width: 58px;
+  height: 58px;
+  display: grid;
+  place-items: center;
+  border-radius: 18px;
+  background: rgba(255,255,255,.16);
+  font-size: 34px;
+  box-shadow: 0 0 22px rgba(255,235,160,.45);
+}
+
+.moon-invite-reader-card {
+  width: min(88vw, 340px);
+  padding: 24px;
+  border-radius: 32px;
+  background:
+    radial-gradient(circle at top, rgba(255,255,255,.22), transparent 34%),
+    linear-gradient(180deg, #1d2554 0%, #34245c 55%, #18243a 100%);
+  color: white;
+  text-align: center;
+  box-shadow:
+    0 18px 44px rgba(0,0,0,.38),
+    0 0 30px rgba(255,220,130,.24);
+}
+
+.moon-invite-big {
+  font-size: 76px;
+  margin-bottom: 8px;
+  filter: drop-shadow(0 0 24px rgba(255,255,210,.75));
+}
+
+.moon-invite-reader-card h2 {
+  margin: 8px 0;
+  color: white;
+  font-size: 26px;
+}
+
+.moon-invite-reader-card p {
+  color: rgba(255,255,255,.84);
+  font-weight: 800;
+  line-height: 1.4;
+}
+
+.moon-invite-code {
+  margin: 18px 0;
+  padding: 14px;
+  border-radius: 22px;
+  background: rgba(255,255,255,.14);
+}
+
+.moon-invite-code span {
+  display: block;
+  font-size: 11px;
+  font-weight: 1000;
+  opacity: .72;
+  text-transform: uppercase;
+  letter-spacing: .1em;
+}
+
+.moon-invite-code strong {
+  display: block;
+  margin-top: 4px;
+  font-size: 30px;
+  letter-spacing: .12em;
+}
+
+.moon-invite-reader-card button {
+  width: 100%;
+  border: 0;
+  border-radius: 999px;
+  padding: 15px;
+  background: linear-gradient(180deg, #ffd55c, #ffae24);
+  color: #32204c;
+  font-weight: 1000;
+  font-size: 17px;
+}
+
+.moon-invite-reader-card small {
+  display: block;
+  margin-top: 14px;
+  color: rgba(255,255,255,.75) !important;
+  font-weight: 900;
 }

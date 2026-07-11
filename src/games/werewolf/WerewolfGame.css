@@ -1,0 +1,1726 @@
+.lobby-bg {
+  background-image:
+    linear-gradient(rgba(10, 8, 20, 0.15), rgba(10, 8, 20, 0.15)),
+    url("/moon-village/backgrounds/lobby.png");
+}
+
+.night-bg {
+  background-image:
+    linear-gradient(rgba(10, 8, 20, 0.18), rgba(10, 8, 20, 0.18)),
+    url("/moon-village/backgrounds/night.png");
+}
+
+.morning-bg {
+  background-image:
+    linear-gradient(rgba(255, 244, 220, 0.08), rgba(255, 244, 220, 0.08)),
+    url("/moon-village/backgrounds/morning.png");
+}
+
+.sunset-bg {
+  background-image:
+    linear-gradient(rgba(60, 22, 20, 0.08), rgba(60, 22, 20, 0.08)),
+    url("/moon-village/backgrounds/sunset.png");
+}
+
+.sunrise-bg {
+  background-image:
+    linear-gradient(rgba(255, 230, 190, 0.08), rgba(255, 230, 190, 0.08)),
+    url("/moon-village/backgrounds/sunrise.png");
+}
+
+.werewolf-screen {
+  transition: background-image 0.5s ease, background-color 0.5s ease;
+  background-color: #000;
+  position: absolute;
+  inset: 0;
+  z-index: 900;
+  width: 100%;
+  height: 100%;
+  min-height: 100%;
+  overflow-y: auto;
+  padding: calc(18px + env(safe-area-inset-top)) 18px
+    calc(24px + env(safe-area-inset-bottom));
+  box-sizing: border-box;
+  font-family: inherit;
+  color: white;
+
+  background-position: center;
+  background-size: cover;
+  background-repeat: no-repeat;
+}
+
+.werewolf-topbar {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 18px;
+  position: relative;
+  z-index: 5;
+}
+
+.werewolf-topbar button {
+  border: none;
+  border-radius: 999px;
+  padding: 10px 14px;
+  background: rgba(255,255,255,.9);
+  color: #33285f;
+  font-weight: 900;
+}
+
+.werewolf-topbar h1 {
+  flex: 1;
+  margin: 0;
+  text-align: center;
+  font-size: 22px;
+}
+
+.werewolf-start-card,
+.werewolf-phase-card {
+  width: 100%;
+  max-width: 430px;
+  margin: 0 auto;
+  padding: 22px;
+  border-radius: 32px;
+  background: rgba(255,255,255,.94);
+  color: #34275b;
+  text-align: center;
+  box-shadow: 0 18px 40px rgba(0,0,0,.24);
+}
+
+.werewolf-moon {
+  font-size: 68px;
+  filter: drop-shadow(0 0 22px rgba(255,255,255,.7));
+}
+
+.werewolf-start-card h2,
+.werewolf-phase-card h2 {
+  margin: 8px 0;
+  font-size: 28px;
+}
+
+.werewolf-start-card p,
+.werewolf-phase-card p {
+  color: #5a4a79;
+  font-weight: 800;
+  line-height: 1.4;
+}
+
+.werewolf-start-card button,
+.werewolf-phase-card button,
+.werewolf-join-row button {
+  border: none;
+  border-radius: 18px;
+  padding: 14px;
+  background: #7c65ff;
+  color: white;
+  font-weight: 900;
+  font-size: 16px;
+}
+
+.werewolf-start-card > button,
+.werewolf-phase-card > button {
+  width: 100%;
+  margin-top: 10px;
+}
+
+button:disabled {
+  opacity: .45;
+}
+
+.werewolf-join-row {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 10px;
+  margin-top: 14px;
+}
+
+.werewolf-join-row input {
+  width: 100%;
+  border: 2px solid #d7cff8;
+  border-radius: 16px;
+  padding: 13px;
+  box-sizing: border-box;
+  font-size: 16px;
+  font-weight: 800;
+  text-transform: uppercase;
+}
+
+.werewolf-message {
+  margin: 12px auto 0;
+  color: #ffdf73 !important;
+  text-align: center;
+  font-weight: 900;
+}
+
+.werewolf-lobby {
+  width: 100%;
+  max-width: 430px;
+  margin: 0 auto;
+}
+
+.moon-village-logo {
+  text-align: center;
+  margin-bottom: 10px;
+  text-shadow: 0 5px 12px rgba(0,0,0,.35);
+}
+
+.moon-village-logo h2 {
+  margin: 0;
+  color: #ff9ed8;
+  font-size: 38px;
+  line-height: .9;
+  letter-spacing: 1px;
+}
+
+.moon-village-logo h3 {
+  margin: 2px 0 6px;
+  color: #caa7ff;
+  font-size: 28px;
+  line-height: .9;
+}
+
+.moon-village-logo span {
+  display: inline-block;
+  padding: 5px 18px;
+  border-radius: 999px;
+  background: #ffb84a;
+  color: white;
+  font-size: 13px;
+  font-weight: 1000;
+}
+
+.werewolf-share-btn {
+  position: absolute;
+  top: calc(18px + env(safe-area-inset-top));
+  right: 18px;
+  z-index: 20;
+  width: 46px;
+  height: 46px;
+  border: none;
+  border-radius: 50%;
+  background: rgba(255,255,255,.16);
+  color: white;
+  font-size: 24px;
+  font-weight: 1000;
+}
+
+.werewolf-main-layout {
+  display: grid;
+  gap: 14px;
+}
+
+.werewolf-room-code {
+  display: block;
+  width: fit-content;
+  margin: 0 auto 12px;
+  padding: 10px 18px;
+  border: none;
+  border-radius: 999px;
+  background: rgba(255,255,255,.16);
+  color: white;
+  text-align: center;
+  cursor: pointer;
+}
+
+.werewolf-room-code:active {
+  transform: scale(.96);
+}
+
+.werewolf-room-code span {
+  display: block;
+  font-size: 11px;
+  font-weight: 900;
+  opacity: .75;
+  text-transform: uppercase;
+  letter-spacing: .08em;
+}
+
+.werewolf-room-code strong {
+  display: block;
+  font-size: 26px;
+  letter-spacing: .12em;
+}
+
+.werewolf-room-code small {
+  display: block;
+  font-weight: 800;
+  opacity: .65;
+}
+
+.werewolf-campfire-area {
+  height: 46vh;
+  min-height: 330px;
+  max-height: 430px;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.moon {
+  position: absolute;
+  top: 8px;
+  right: 26px;
+  font-size: 54px;
+  filter: drop-shadow(0 0 22px rgba(255,255,255,.65));
+}
+
+.campfire-circle {
+  width: min(94vw, 430px);
+  height: min(94vw, 430px);
+  position: relative;
+  border-radius: 50%;
+}
+
+.fire {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 105px;
+  height: 105px;
+  transform: translate(-50%, -50%);
+  border-radius: 50%;
+  background: rgba(255,198,95,.2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 70px;
+  box-shadow: 0 0 60px rgba(255,172,68,.65);
+}
+
+.player-seat {
+  position: absolute;
+  width: 72px;
+  height: auto;
+  background: transparent;
+  border: none;
+  border-radius: 0;
+  box-shadow: none;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+}
+
+.player-seat span {
+  margin-top: 4px;
+  max-width: 72px;
+  font-size: 11px;
+  font-weight: 700;
+  color: white;
+  text-align: center;
+  text-shadow: 0 2px 4px rgba(0,0,0,.6);
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.werewolf-lobby-actions {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+
+.werewolf-lobby-actions button {
+  border: none;
+  border-radius: 18px;
+  padding: 13px;
+  background: rgba(255,255,255,.14);
+  color: white;
+  font-weight: 1000;
+}
+
+.werewolf-players-card {
+  padding: 16px;
+  border-radius: 26px;
+  background: rgba(10,17,45,.72);
+  border: 1px solid rgba(255,255,255,.16);
+  box-shadow: 0 18px 40px rgba(0,0,0,.22);
+}
+
+.werewolf-players-card h2 {
+  margin: 0 0 8px;
+  text-align: center;
+  font-size: 16px;
+  text-transform: uppercase;
+  letter-spacing: .08em;
+}
+
+.werewolf-player-count {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 12px;
+  color: rgba(255,255,255,.8);
+  font-weight: 900;
+}
+
+.werewolf-player-count small {
+  color: rgba(255,255,255,.55);
+}
+
+.werewolf-player-list {
+  display: grid;
+  gap: 8px;
+  margin: 14px 0;
+}
+
+.werewolf-player-list div {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px;
+  border-radius: 18px;
+  background: rgba(255,255,255,.08);
+  color: white;
+}
+
+.werewolf-player-list strong {
+  color: white;
+}
+
+.werewolf-player-list span {
+  color: #7dff7a;
+  font-size: 12px;
+  font-weight: 900;
+}
+
+.werewolf-start-btn,
+.host-next-btn {
+  width: 100%;
+  margin-top: 12px;
+  border: none;
+  border-radius: 18px;
+  padding: 16px;
+  background: linear-gradient(180deg, #ffd55c, #ffae24);
+  color: #32204c;
+  font-size: 18px;
+  font-weight: 1000;
+  box-shadow: 0 10px 24px rgba(255,180,40,.35);
+}
+
+.werewolf-waiting-text {
+  text-align: center;
+  color: rgba(255,255,255,.7);
+  font-weight: 800;
+}
+
+.phase-label {
+  margin: 0;
+  color: #8a6dff !important;
+  text-transform: uppercase;
+  letter-spacing: .12em;
+  font-size: 12px;
+}
+
+.role-big-emoji {
+  font-size: 92px;
+  margin: 10px 0;
+  filter: drop-shadow(0 12px 22px rgba(0,0,0,.18));
+}
+
+.role-reveal-card h3 {
+  margin: 0 0 12px;
+  color: #7c65ff;
+}
+
+.secret-info {
+  display: grid;
+  gap: 6px;
+  padding: 14px;
+  margin: 14px 0;
+  border-radius: 20px;
+  background: #f5f1ff;
+}
+
+.secret-info strong {
+  color: #34275b;
+}
+
+.secret-info span {
+  color: #7c65ff;
+  font-weight: 900;
+}
+
+.night-card {
+  background:
+    radial-gradient(circle at top, rgba(140,120,255,.22), transparent 34%),
+    rgba(20,20,55,.95);
+  color: white;
+}
+
+.night-card p,
+.night-card h2 {
+  color: white !important;
+}
+
+.day-card {
+  background:
+    radial-gradient(circle at top, rgba(255,230,160,.7), transparent 40%),
+    rgba(255,255,255,.96);
+}
+
+.target-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  margin: 16px 0;
+}
+
+.target-grid button {
+  min-height: 110px;
+  display: grid;
+  place-items: center;
+  gap: 4px;
+  border: none;
+  border-radius: 22px;
+  background: #f5f1ff;
+  color: #34275b;
+  font-weight: 900;
+}
+
+.target-grid button span {
+  font-size: 34px;
+}
+
+.target-grid button.selected {
+  background: linear-gradient(180deg, #ffe08a, #ffbb3d);
+  color: #34275b;
+  box-shadow:
+    0 0 0 4px rgba(255,200,80,.35),
+    0 0 18px rgba(255,210,120,.8),
+    0 0 36px rgba(255,180,60,.55);
+
+  transform: scale(1.05);
+  animation: votePulse .9s infinite alternate;
+}
+
+.small-note {
+  font-size: 13px;
+  opacity: .8;
+}
+
+.result-player {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 18px;
+  margin: 16px 0;
+  border-radius: 24px;
+  background: #f5f1ff;
+  text-align: center;
+}
+
+.result-player img {
+  width: 72px;
+  height: 72px;
+  object-fit: cover;
+  border-radius: 50%;
+}
+
+.result-player strong {
+  font-size: 22px;
+  color: #34275b;
+}
+
+.result-player small {
+  color: #7c65ff;
+  font-weight: 900;
+}
+
+.discussion-screen {
+  width: 100%;
+  max-width: 430px;
+  height: calc(100dvh - 110px);
+  margin: 0 auto;
+  display: grid;
+  grid-template-rows: auto 1fr auto auto;
+  gap: 12px;
+}
+
+.discussion-header {
+  text-align: center;
+}
+
+.discussion-header p,
+.discussion-header h2,
+.discussion-header span {
+  margin: 0;
+}
+
+.discussion-header h2 {
+  font-size: 30px;
+}
+
+.discussion-header span {
+  opacity: .72;
+  font-weight: 800;
+}
+
+.chat-box {
+  overflow-y: auto;
+  padding: 12px;
+  border-radius: 26px;
+  background: rgba(255,255,255,.12);
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.chat-bubble {
+  max-width: 82%;
+  align-self: flex-start;
+  padding: 11px 13px;
+  border-radius: 18px 18px 18px 4px;
+  background: rgba(255,255,255,.9);
+  color: #34275b;
+}
+
+.chat-bubble.mine {
+  align-self: flex-end;
+  border-radius: 18px 18px 4px 18px;
+  background: #ffd55c;
+}
+
+.chat-bubble strong {
+  display: block;
+  font-size: 12px;
+  color: #7c65ff;
+}
+
+.chat-bubble p {
+  margin: 3px 0 0;
+  font-weight: 800;
+}
+
+.chat-input-row {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 8px;
+}
+
+.chat-input-row input {
+  border: none;
+  border-radius: 999px;
+  padding: 14px 16px;
+  font-weight: 800;
+}
+
+.chat-input-row button {
+  border: none;
+  border-radius: 999px;
+  padding: 0 18px;
+  background: #ffd55c;
+  color: #34275b;
+  font-weight: 1000;
+}
+
+.final-role-list {
+  display: grid;
+  gap: 10px;
+  margin: 18px 0;
+}
+
+.final-role-list div {
+  display: grid;
+  grid-template-columns: 44px 1fr auto;
+  align-items: center;
+  gap: 8px;
+  padding: 12px;
+  border-radius: 18px;
+  background: #f5f1ff;
+}
+
+.final-role-list span {
+  font-size: 28px;
+}
+
+.final-role-list strong {
+  text-align: left;
+  color: #34275b;
+}
+
+.final-role-list small {
+  color: #7c65ff;
+  font-weight: 900;
+}
+
+.game-over-card h2 {
+  font-size: 34px;
+}
+
+@media (min-width: 760px) {
+  .werewolf-main-layout {
+    grid-template-columns: 1fr 230px;
+    align-items: center;
+    max-width: 760px;
+    margin: 0 auto;
+  }
+
+  .werewolf-lobby {
+    max-width: 760px;
+  }
+}
+
+@media (max-height: 740px) {
+  .werewolf-campfire-area {
+    min-height: 280px;
+    height: 40vh;
+  }
+
+  .player-seat {
+  width: 64px;
+  height: auto;
+}
+
+  .fire {
+    width: 88px;
+    height: 88px;
+    font-size: 58px;
+  }
+
+  .werewolf-phase-card,
+  .werewolf-start-card {
+    padding: 18px;
+  }
+}
+.werewolf-invite-panel {
+  position: fixed;
+  left: 18px;
+  right: 18px;
+  bottom: calc(18px + env(safe-area-inset-bottom));
+  z-index: 9999999;
+  max-width: 430px;
+  margin: 0 auto;
+  padding: 16px;
+  border-radius: 28px;
+  background: rgba(255,255,255,.96);
+  color: #34275b;
+  box-shadow: 0 18px 50px rgba(0,0,0,.35);
+}
+
+.werewolf-invite-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 12px;
+}
+
+.werewolf-invite-head h2 {
+  margin: 0;
+  font-size: 22px;
+}
+
+.werewolf-invite-head button {
+  width: 38px;
+  height: 38px;
+  border: none;
+  border-radius: 50%;
+  background: #f1eaff;
+  color: #5b4a7b;
+  font-size: 24px;
+  font-weight: 900;
+}
+
+.werewolf-empty-invite {
+  margin: 0;
+  color: #6d5b83;
+  font-weight: 800;
+  text-align: center;
+}
+
+.werewolf-invite-list {
+  display: grid;
+  gap: 10px;
+  max-height: 45vh;
+  overflow-y: auto;
+}
+
+.werewolf-invite-row {
+  display: grid;
+  grid-template-columns: 46px 1fr auto;
+  align-items: center;
+  gap: 10px;
+  padding: 10px;
+  border-radius: 20px;
+  background: #f5f1ff;
+}
+
+.werewolf-invite-row span {
+  width: 46px;
+  height: 46px;
+  display: grid;
+  place-items: center;
+  border-radius: 16px;
+  background: white;
+  font-size: 26px;
+}
+
+.werewolf-invite-row section {
+  min-width: 0;
+}
+
+.werewolf-invite-row strong,
+.werewolf-invite-row small {
+  display: block;
+}
+
+.werewolf-invite-row strong {
+  color: #34275b;
+  font-size: 15px;
+}
+
+.werewolf-invite-row small {
+  color: #7c65ff;
+  font-size: 12px;
+  font-weight: 900;
+}
+
+.werewolf-invite-row button {
+  border: none;
+  border-radius: 999px;
+  padding: 10px 12px;
+  background: #7c65ff;
+  color: white;
+  font-weight: 1000;
+}
+
+.werewolf-invite-row button:disabled {
+  background: #c8bedf;
+}
+.werewolf-room-code {
+  transition:
+    transform .18s ease,
+    background .25s ease,
+    box-shadow .25s ease,
+    color .25s ease;
+}
+
+.werewolf-room-code.copied {
+  background: linear-gradient(135deg, #fff2a8, #ffd6e8) !important;
+  color: #4b314d !important;
+
+  box-shadow:
+    0 0 0 2px rgba(255,255,255,.25),
+    0 0 18px rgba(255,220,120,.45),
+    0 0 36px rgba(255,180,220,.35);
+
+  transform: scale(1.04);
+
+  animation: roomCodeGlow .8s ease;
+}
+
+.werewolf-room-code.copied span,
+.werewolf-room-code.copied strong,
+.werewolf-room-code.copied small {
+  color: #4b314d !important;
+}
+
+@keyframes roomCodeGlow {
+  0% {
+    transform: scale(1);
+    box-shadow:
+      0 0 0 rgba(255,220,120,0);
+  }
+
+  35% {
+    transform: scale(1.06);
+    box-shadow:
+      0 0 14px rgba(255,220,120,.75),
+      0 0 34px rgba(255,180,220,.55);
+  }
+
+  100% {
+    transform: scale(1.04);
+  }
+}
+/* ROOM CODE COPIED FEEDBACK - FINAL OVERRIDE */
+
+.werewolf-room-code {
+  transition:
+    transform .18s ease,
+    background .25s ease,
+    box-shadow .25s ease,
+    color .25s ease !important;
+}
+
+.werewolf-room-code.copied {
+  background: linear-gradient(135deg, #fff2a8, #ffd6e8) !important;
+  color: #4b314d !important;
+
+  transform: scale(1.06) !important;
+
+  box-shadow:
+    0 0 0 3px rgba(255,255,255,.45),
+    0 0 22px rgba(255,220,120,.9),
+    0 0 48px rgba(255,150,220,.75) !important;
+
+  animation: roomCodeCopiedPulse .9s ease-in-out infinite alternate !important;
+}
+
+.werewolf-room-code.copied span,
+.werewolf-room-code.copied strong,
+.werewolf-room-code.copied small {
+  color: #4b314d !important;
+}
+
+@keyframes roomCodeCopiedPulse {
+  from {
+    transform: scale(1.03);
+    box-shadow:
+      0 0 0 2px rgba(255,255,255,.35),
+      0 0 14px rgba(255,220,120,.55),
+      0 0 28px rgba(255,150,220,.45);
+  }
+
+  to {
+    transform: scale(1.08);
+    box-shadow:
+      0 0 0 4px rgba(255,255,255,.55),
+      0 0 28px rgba(255,220,120,1),
+      0 0 58px rgba(255,150,220,.9);
+  }
+}
+.werewolf-player-list span.ready {
+  color: #7dff7a !important;
+}
+
+.werewolf-player-list span.not-ready {
+  color: #ffcf6a !important;
+}
+
+
+
+
+
+
+/* =========================
+   DEV TEST PANEL - START
+   Delete this whole block later
+   ========================= */
+
+.werewolf-dev-panel {
+  margin-top: 14px;
+  padding: 12px;
+  border-radius: 20px;
+  background: rgba(255, 213, 92, 0.14);
+  border: 1px dashed rgba(255, 213, 92, 0.65);
+  color: white;
+  text-align: center;
+}
+
+.werewolf-dev-panel strong {
+  display: block;
+  margin-bottom: 10px;
+  color: #ffd55c;
+  font-size: 13px;
+  text-transform: uppercase;
+  letter-spacing: .08em;
+}
+
+.werewolf-dev-panel div {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 8px;
+}
+
+.werewolf-dev-panel button {
+  border: none;
+  border-radius: 14px;
+  padding: 11px;
+  background: rgba(255,255,255,.14);
+  color: white;
+  font-weight: 1000;
+}
+
+.werewolf-dev-panel small {
+  display: block;
+  margin-top: 9px;
+  color: rgba(255,255,255,.62);
+  font-weight: 800;
+  font-size: 11px;
+}
+
+/* =========================
+   DEV TEST PANEL - END
+   ========================= */
+
+
+
+
+
+   /* =========================
+   HOST CONTROL PANEL - START
+   Keep this for real gameplay
+   ========================= */
+
+.host-control-panel {
+  width: 100%;
+  max-width: 430px;
+  margin: 14px auto 0;
+  padding: 14px;
+  border-radius: 22px;
+  background: rgba(10, 17, 45, 0.78);
+  border: 1px solid rgba(255,255,255,.16);
+  color: white;
+  text-align: center;
+  box-shadow: 0 14px 32px rgba(0,0,0,.22);
+}
+
+.host-control-panel strong {
+  display: block;
+  margin-bottom: 10px;
+  color: #ffd55c;
+  font-size: 13px;
+  text-transform: uppercase;
+  letter-spacing: .08em;
+}
+
+.host-control-panel div {
+  display: grid;
+  gap: 8px;
+}
+
+.host-control-panel button {
+  border: none;
+  border-radius: 16px;
+  padding: 12px;
+  background: rgba(255,255,255,.14);
+  color: white;
+  font-weight: 1000;
+}
+
+.host-control-panel button:last-child {
+  background: rgba(255, 110, 140, 0.28);
+}
+
+/* =========================
+   HOST CONTROL PANEL - END
+   ========================= */
+
+
+   .target-grid button small {
+  display: block;
+  margin-top: 4px;
+  color: #7c65ff;
+  font-size: 12px;
+  font-weight: 1000;
+}
+.vote-selected {
+  display: block;
+  margin-top: 4px;
+  font-size: 12px;
+  font-weight: 1000;
+  color: #7c65ff;
+}
+
+@keyframes votePulse {
+  from {
+    transform: scale(1.03);
+    box-shadow:
+      0 0 0 4px rgba(255,200,80,.25),
+      0 0 12px rgba(255,210,120,.45);
+  }
+
+  to {
+    transform: scale(1.06);
+    box-shadow:
+      0 0 0 4px rgba(255,200,80,.45),
+      0 0 28px rgba(255,210,120,.9);
+  }
+}
+.vote-target-btn {
+  transition:
+    transform .18s ease,
+    background .22s ease,
+    box-shadow .22s ease !important;
+}
+
+.vote-target-btn.voted {
+  background: linear-gradient(180deg, #ffe08a, #ffbb3d) !important;
+  color: #34275b !important;
+  transform: scale(1.05) !important;
+
+  box-shadow:
+    0 0 0 4px rgba(255,200,80,.35),
+    0 0 20px rgba(255,220,120,.9),
+    0 0 42px rgba(255,170,80,.65) !important;
+
+  animation: voteTargetGlow .85s ease-in-out infinite alternate;
+}
+
+.vote-target-btn.voted span,
+.vote-target-btn.voted strong,
+.vote-target-btn.voted small {
+  color: #34275b !important;
+}
+
+.vote-target-btn small {
+  display: block;
+  margin-top: 4px;
+  font-size: 12px;
+  font-weight: 1000;
+}
+
+@keyframes voteTargetGlow {
+  from {
+    transform: scale(1.03);
+  }
+
+  to {
+    transform: scale(1.07);
+  }
+}
+.seer-result-card {
+  margin-top: 14px;
+  padding: 16px;
+  border-radius: 22px;
+  background: #f5f1ff;
+  color: #34275b;
+  box-shadow: 0 0 24px rgba(124, 101, 255, 0.28);
+}
+
+.seer-result-card p {
+  margin: 0;
+  color: #7c65ff !important;
+  font-weight: 1000;
+}
+
+.seer-result-card h3 {
+  margin: 6px 0;
+  font-size: 24px;
+}
+
+.seer-result-card strong,
+.seer-result-card small {
+  display: block;
+  font-weight: 1000;
+}
+.hunter-card {
+  background:
+    radial-gradient(circle at top, rgba(255, 213, 92, .35), transparent 36%),
+    rgba(30, 24, 55, .96);
+  color: white;
+}
+
+.hunter-card h2,
+.hunter-card p {
+  color: white !important;
+}
+.target-grid button:disabled {
+  opacity: 0.45;
+  filter: grayscale(0.7);
+}
+
+.target-grid button small {
+  display: block;
+  margin-top: 4px;
+  color: #7c65ff;
+  font-size: 12px;
+  font-weight: 1000;
+}
+.role-card-image {
+  width: min(82vw, 310px);
+  max-height: 460px;
+  object-fit: contain;
+  display: block;
+  margin: 10px auto 16px;
+  border-radius: 22px;
+  box-shadow:
+    0 18px 40px rgba(0,0,0,.35),
+    0 0 28px rgba(255,220,150,.25);
+}
+.momo-avatar {
+  width: 46px;
+  height: 46px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid rgba(255,255,255,.9);
+  box-shadow: 0 4px 10px rgba(0,0,0,.25);
+}
+
+.vote-momo-avatar {
+  width: 64px;
+  height: 64px;
+  object-fit: cover;
+  border-radius: 50%;
+  display: block;
+}
+
+.momo-seat-avatar {
+  width: 76px;
+  height: 76px;
+  object-fit: cover;
+  border-radius: 50%;
+  display: block;
+}
+/* =========================
+   RESULT ASSET SCREENS
+   ========================= */
+
+.result-screen-wrapper {
+  width: 100%;
+  max-width: 430px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.result-asset-panel {
+  position: relative;
+  width: 100%;
+  max-width: 430px;
+  margin: 0 auto;
+}
+
+.result-panel-image {
+  display: block;
+  width: 100%;
+  height: auto;
+  object-fit: contain;
+  pointer-events: none;
+  user-select: none;
+  filter: drop-shadow(0 18px 30px rgba(0, 0, 0, 0.32));
+}
+
+/* Dynamic avatar and name placed over the empty result area */
+
+.result-dynamic-content {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 72%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  pointer-events: none;
+}
+
+.result-night-content,
+.result-vote-content {
+  top: 35%;
+}
+
+.result-character-avatar {
+  width: clamp(76px, 24vw, 104px);
+  height: clamp(76px, 24vw, 104px);
+  display: block;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 4px solid rgba(255, 245, 214, 0.95);
+  box-shadow:
+    0 7px 16px rgba(0, 0, 0, 0.32),
+    0 0 18px rgba(255, 221, 143, 0.45);
+}
+
+.result-character-name {
+  max-width: 90%;
+  margin-top: 9px;
+  color: #fff7dc;
+  font-size: clamp(20px, 6vw, 28px);
+  font-weight: 1000;
+  line-height: 1;
+  text-shadow:
+    0 2px 3px rgba(0, 0, 0, 0.85),
+    0 0 9px rgba(0, 0, 0, 0.65);
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.result-no-elimination-text {
+  position: absolute;
+  top: 43%;
+  left: 50%;
+  width: 72%;
+  transform: translateX(-50%);
+  color: #fff7dc;
+  font-size: clamp(20px, 5.5vw, 27px);
+  font-weight: 1000;
+  text-align: center;
+  text-shadow:
+    0 2px 3px rgba(0, 0, 0, 0.85),
+    0 0 9px rgba(0, 0, 0, 0.65);
+}
+
+/* Green button asset positioned inside the result panel */
+
+.result-continue-button {
+  position: absolute;
+  left: 50%;
+  bottom: 5.5%;
+  z-index: 5;
+  width: 66%;
+  margin: 0;
+  padding: 0;
+  transform: translateX(-50%);
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+  cursor: pointer;
+  transition:
+    transform 0.15s ease,
+    filter 0.15s ease;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.result-continue-button img {
+  display: block;
+  width: 100%;
+  height: auto;
+  pointer-events: none;
+  user-select: none;
+}
+
+.result-continue-button:hover:not(:disabled) {
+  transform: translateX(-50%) scale(1.03);
+  filter: brightness(1.06);
+}
+
+.result-continue-button:active:not(:disabled) {
+  transform: translateX(-50%) scale(0.97);
+}
+
+.result-continue-button:disabled {
+  opacity: 1;
+  cursor: default;
+}
+
+.result-waiting-message {
+  margin: 10px 0 0;
+  color: rgba(255, 255, 255, 0.86);
+  font-size: 13px;
+  font-weight: 900;
+  text-align: center;
+  text-shadow: 0 2px 5px rgba(0, 0, 0, 0.65);
+}
+
+@media (max-height: 740px) {
+  .result-asset-panel {
+    max-width: 365px;
+  }
+}
+/* =========================
+   FINAL RESULT SYSTEM
+   ========================= */
+
+.result-dynamic-content {
+  position: absolute;
+  left: 50%;
+  width: 72%;
+  transform: translateX(-50%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  pointer-events: none;
+}
+
+/* Last Night Result avatar position */
+
+.result-night-content {
+  top: 34%;
+}
+
+/* Vote Result avatar position */
+
+.result-vote-content {
+  top: 34%;
+}
+
+.result-character-avatar {
+width: clamp(190px, 40vw, 205px);
+height: clamp(190px, 40vw, 205px);
+  object-fit: cover;
+  border-radius: 50%;
+  border: none;
+  background: rgba(255, 255, 255, 0.16);
+  box-shadow:
+    0 8px 16px rgba(0, 0, 0, 0.36),
+    0 0 20px rgba(255, 218, 130, 0.48);
+}
+
+.result-character-name {
+  display: block;
+  max-width: 90%;
+  margin-top: 10px;
+  color: #fff5d7;
+  font-size: clamp(20px, 6vw, 28px);
+  font-weight: 1000;
+  line-height: 1;
+  text-align: center;
+  text-shadow:
+    0 3px 4px rgba(0, 0, 0, 0.9),
+    0 0 10px rgba(0, 0, 0, 0.72);
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.result-no-elimination-text {
+  position: absolute;
+  top: 43%;
+  left: 50%;
+  width: 72%;
+  transform: translateX(-50%);
+  color: #fff5d7;
+  font-size: clamp(19px, 5.5vw, 27px);
+  font-weight: 1000;
+  line-height: 1.15;
+  text-align: center;
+  text-shadow:
+    0 3px 4px rgba(0, 0, 0, 0.9),
+    0 0 10px rgba(0, 0, 0, 0.72);
+}
+
+.result-continue-waiting {
+  opacity: 0.55;
+  pointer-events: none;
+  filter: grayscale(0.25);
+}
+
+/* =========================
+   GAME SUMMARY
+   ========================= */
+
+.summary-result-panel {
+  position: relative;
+  transform: translateY(20px);
+}
+
+.game-summary-player-list {
+  position: absolute;
+  top: 35%;
+  left: 50.5%;
+  width: 78%;
+  height: 38%;
+  transform: translateX(-50%);
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+  padding-right: 3px;
+  box-sizing: border-box;
+  overflow-y: auto;
+  scrollbar-width: thin;
+}
+
+.game-summary-player-row {
+  flex: 0 0 auto;
+  display: grid;
+  grid-template-columns: 44px minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 9px;
+  min-height: 52px;
+  padding: 7px 9px;
+  box-sizing: border-box;
+  border: 1px solid rgba(255, 245, 210, 0.2);
+  border-radius: 16px;
+  background: rgba(18, 20, 43, 0.74);
+  box-shadow: 0 5px 12px rgba(0, 0, 0, 0.24);
+}
+
+.game-summary-avatar {
+  width: 44px;
+  height: 44px;
+  display: block;
+  object-fit: cover;
+  border: 2px solid rgba(255, 245, 210, 0.9);
+  border-radius: 50%;
+}
+
+.game-summary-player-info {
+  min-width: 0;
+}
+
+.game-summary-player-info strong,
+.game-summary-player-info small {
+  display: block;
+}
+
+.game-summary-player-info strong {
+  color: #fff8df;
+  font-size: 14px;
+  font-weight: 1000;
+  line-height: 1.1;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.game-summary-player-info small {
+  margin-top: 3px;
+  color: #dccdff;
+  font-size: 11px;
+  font-weight: 900;
+}
+
+.game-summary-team {
+  padding: 5px 7px;
+  border-radius: 999px;
+  font-size: 9px;
+  font-weight: 1000;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.game-summary-team.good {
+  background: rgba(112, 230, 158, 0.2);
+  color: #a7ffc6;
+}
+
+.game-summary-team.evil {
+  background: rgba(255, 105, 128, 0.2);
+  color: #ffb0bc;
+}
+
+.summary-continue-button {
+  bottom: 4.5%;
+}
+
+@media (max-height: 740px) {
+  .game-summary-player-list {
+    gap: 5px;
+  }
+
+  .game-summary-player-row {
+    min-height: 46px;
+    padding: 5px 7px;
+  }
+
+  .game-summary-avatar {
+    width: 38px;
+    height: 38px;
+  }
+}
+.game-summary-player-info small {
+  margin-top: 3px;
+  color: #dccdff;
+  font-size: 11px;
+  font-weight: 900;
+}
+
+.game-summary-player-info small.evil-role {
+  color: #ff6b6b;
+}
+/* Last Night Result Position Override */
+
+.result-dynamic-content.result-night-content {
+  margin-top: -12px !important;
+}
+/* Vote Result Position Override */
+
+.result-dynamic-content.result-vote-content {
+  margin-top: -17px !important;
+}
+/* =========================
+   MOON VILLAGE START SCREEN
+   ========================= */
+
+.moon-village-start-screen {
+  width: 100%;
+  max-width: 430px;
+  margin: 0 auto;
+}
+
+.moon-village-start-panel {
+  position: relative;
+  width: 100%;
+  margin: 72px auto 0;
+}
+
+.moon-village-panel-image {
+  display: block;
+  width: 100%;
+  height: auto;
+  pointer-events: none;
+  user-select: none;
+  filter: drop-shadow(0 18px 32px rgba(0, 0, 0, 0.32));
+}
+
+.moon-village-start-controls {
+  position: absolute;
+  left: 50%;
+  bottom: 6.5%;
+  width: 86%;
+  transform: translateX(-50%);
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+/* Create Room */
+
+.moon-village-create-button {
+  display: block;
+  width: 100%;
+  margin: 0;
+  padding: 0;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  transition:
+    transform 0.15s ease,
+    filter 0.15s ease;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.moon-village-create-button img {
+  display: block;
+  width: 100%;
+  height: auto;
+  pointer-events: none;
+}
+
+.moon-village-create-button:active {
+  transform: scale(0.97);
+}
+
+/* Room code + Join row */
+
+.moon-village-join-row {
+  display: grid;
+  grid-template-columns: minmax(0, 470fr) minmax(115px, 230fr);
+  align-items: stretch;
+  gap: 8px;
+}
+
+.moon-village-room-code {
+  position: relative;
+  min-width: 0;
+}
+
+.room-code-panel-image {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: fill;
+  pointer-events: none;
+  user-select: none;
+}
+
+.moon-village-room-code input {
+  position: absolute;
+  inset: 13% 8%;
+  width: 84%;
+  height: 74%;
+  margin: 0;
+  padding: 0 12px;
+  box-sizing: border-box;
+  border: none;
+  outline: none;
+  background: transparent;
+  color: #392568;
+  font-family: inherit;
+  font-size: clamp(15px, 4.6vw, 21px);
+  font-weight: 1000;
+  text-align: center;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+.moon-village-room-code input::placeholder {
+  color: rgba(74, 53, 104, 0.48);
+  opacity: 1;
+}
+
+/* Join button */
+
+.moon-village-join-button {
+  display: block;
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  transition:
+    transform 0.15s ease,
+    filter 0.15s ease;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.moon-village-join-button img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: fill;
+  pointer-events: none;
+}
+
+.moon-village-join-button:active {
+  transform: scale(0.95);
+}
+
+.moon-village-create-button:hover,
+.moon-village-join-button:hover {
+  filter: brightness(1.05);
+}
+
+@media (max-height: 740px) {
+  .moon-village-start-panel {
+    max-width: 365px;
+    margin: 0 auto;
+  }
+
+  .moon-village-start-controls {
+    bottom: 5.5%;
+    gap: 7px;
+  }
+}
+/* =====================================
+   FORCE OVERRIDE - ARCADE BUTTON
+   ===================================== */
+
+.werewolf-topbar .arcade-back-btn {
+  all: unset;
+
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 6px !important;
+
+  width: 120px !important;
+  height: 42px !important;
+  padding: 0 14px !important;
+
+  border-radius: 999px !important;
+  border: 3px solid #d8ad61 !important;
+
+  background: linear-gradient(
+    180deg,
+    #5f4b82 0%,
+    #45335f 55%,
+    #322445 100%
+  ) !important;
+
+  color: #fff6df !important;
+  font-size: 17px !important;
+  font-weight: 1000 !important;
+  font-family: inherit !important;
+  line-height: 1 !important;
+
+  text-shadow: 0 2px 3px rgba(0,0,0,.45) !important;
+
+  box-shadow:
+    inset 0 2px 0 rgba(255,255,255,.18),
+    inset 0 -2px 0 rgba(0,0,0,.28),
+    0 5px 12px rgba(0,0,0,.35) !important;
+
+  cursor: pointer !important;
+  transition: transform .15s ease !important;
+}
+
+.werewolf-topbar .arcade-back-btn:active {
+  transform: scale(.96);
+}
+
+.arcade-back-arrow {
+  font-size: 20px !important;
+  line-height: 1;
+}
