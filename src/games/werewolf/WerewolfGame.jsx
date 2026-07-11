@@ -560,20 +560,26 @@ export default function WerewolfGame({
     return false;
   }
 
-  async function submitNightAction() {
+ async function submitNightAction() {
   if (!selectedTarget || !user || !canActNow()) return;
 
+  const currentNightStep = room?.nightStep;
+
+  const selectedPlayer = players.find(
+    (player) => player.uid === selectedTarget
+  );
+
   const action =
-    room?.nightStep === "cupid"
+    currentNightStep === "cupid"
       ? {
           role: myRole,
-          step: room.nightStep,
+          step: currentNightStep,
           targetUid: selectedTarget,
           secondTargetUid: secondTarget,
         }
       : {
           role: myRole,
-          step: room.nightStep,
+          step: currentNightStep,
           targetUid: selectedTarget,
         };
 
@@ -581,16 +587,39 @@ export default function WerewolfGame({
     [`nightActions.${user.uid}`]: action,
   };
 
-  if (room?.nightStep === "healer") {
+  if (currentNightStep === "healer") {
     updates.lastHealTarget = selectedTarget;
   }
 
-  if (room?.nightStep === "guardian") {
+  if (currentNightStep === "guardian") {
     updates.lastGuardTarget = selectedTarget;
   }
 
-  await updateDoc(doc(db, "werewolfRooms", roomCode), updates);
+  if (
+    currentNightStep === "seer" &&
+    myRole === ROLES.SEER &&
+    selectedPlayer
+  ) {
+    setSeerResult({
+      name: selectedPlayer.name || "Unknown",
+      team:
+        selectedPlayer.role === ROLES.WEREWOLF ||
+        selectedPlayer.role === ROLES.MINION
+          ? "Evil"
+          : "Good",
+      role: selectedPlayer.role || "Unknown",
+    });
+  }
 
+  await updateDoc(
+    doc(db, "werewolfRooms", roomCode),
+    updates
+  );
+
+  if (currentNightStep === "seer") {
+    setMessage("Vision revealed.");
+    return;
+  }
 
   setMessage("Action submitted.");
   setSelectedTarget("");
@@ -1518,22 +1547,11 @@ async function hostRestartNight() {
                     key={player.uid}
                     className={selectedTarget === player.uid ? "selected" : ""}
                     disabled={isBlocked}
-                    onClick={() => {
-                      if (isBlocked) return;
+                   onClick={() => {
+                    if (isBlocked) return;
 
-                      setSelectedTarget(player.uid);
-
-                      if (myRole === ROLES.SEER && room?.nightStep === "seer") {
-                        setSeerResult({
-                          name: player.name || "Unknown",
-                          team:
-                            player.role === ROLES.WEREWOLF || player.role === ROLES.MINION
-                              ? "Evil"
-                              : "Good",
-                          role: player.role || "Unknown",
-                        });
-                      }
-                    }}
+                    setSelectedTarget(player.uid);
+                  }}
                   >
                     <img
                       className="vote-momo-avatar"
