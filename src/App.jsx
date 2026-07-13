@@ -16,6 +16,7 @@ import {
 import FriendsScreen from "./friends/FriendsScreen";
 import BubuPantry from "./games/BubuPantry";
 import WerewolfGame from "./games/werewolf/WerewolfGame";
+import MomoBeatArena from "./games/momo-beat/MomoBeatArena";
 import Arcade from "./screens/Arcade";
 
 const SAVE_KEY = "momo-save-v101";
@@ -1278,6 +1279,7 @@ const [activeRooms, setActiveRooms] = useState(() => {
   const [friends, setFriends] = useState([]);
   const [openedPostcard, setOpenedPostcard] = useState(null);
   const [pendingWerewolfRoomCode, setPendingWerewolfRoomCode] = useState("");
+  const [pendingBeatArenaRoomCode, setPendingBeatArenaRoomCode] = useState(""); 
   const [mailTab, setMailTab] = useState("mail");
   const [selectedGiftId, setSelectedGiftId] = useState("");
   const [selectedGiftType, setSelectedGiftType] = useState("");
@@ -3023,6 +3025,20 @@ function acceptMoonVillageInvite(postcard) {
   setPendingWerewolfRoomCode(postcard.roomCode);
 }
 
+function acceptBeatArenaInvite(postcard) {
+  if (!postcard.roomCode) {
+    showPop("Missing room code");
+    return;
+  }
+
+  setOpenedPostcard(null);
+  setShowArcade(false);
+  setPendingBeatArenaRoomCode(
+    postcard.roomCode.trim().toUpperCase()
+  );
+  setScreen("momo-beat-arena");
+}
+
 async function openPostcard(postcard) {
   setOpenedPostcard({
     ...postcard,
@@ -3340,6 +3356,25 @@ if (screen === "reveal") {
     </div>
   );
 }
+
+if (screen === "momo-beat-arena") {
+  return (
+    <MomoBeatArena
+      user={{
+        uid: auth.currentUser?.uid || "local-player",
+        displayName: displayName || "Player",
+      }}
+      momoImage={`/moods/${(momo || "Momo").toLowerCase()}/happy.png`}
+      initialRoomCode={pendingBeatArenaRoomCode}
+      onExit={() => {
+        setPendingBeatArenaRoomCode("");
+        setScreen("home");
+        setShowArcade(true);
+      }}
+    />
+  );
+}
+
 
 const currentRoom = ROOMS[roomIndex];
 
@@ -4132,6 +4167,8 @@ const visitRoomBg =
 />
 )}
 
+
+
 {activeGame === "dream-match" && (
   <div className="game-overlay">
     <div className="dream-match-panel">
@@ -4891,55 +4928,77 @@ return (
         ))}
 
 
-          {receivedPostcards.map((postcard) => (
-            <button
-              className={`mail-inbox-card ${
-                postcard.type === "moonVillageInvite" ? "moon-invite-mail" : ""
-              }`}
-              key={postcard.id}
-              onClick={() => openPostcard(postcard)}
-            >
-              <div className="mail-icon">
-              💌
-              {!postcard.read && <span className="mail-unread-dot" />}
-            </div>
+          {receivedPostcards.map((postcard) => {
+            const isMoonInvite =
+              postcard.type === "moonVillageInvite";
 
-              <div>
-                <span>
-                  {postcard.type === "moonVillageInvite" ? "Moon Village Invite" : "Postcard"}
-                </span>
-                <strong>
-                  {postcard.type === "moonVillageInvite"
-                    ? `${postcard.fromUsername || "Friend"} invited you`
-                    : `From ${postcard.fromUsername || "Friend"}`}
-                </strong>
-                <p>
-                  {postcard.message
-                    ? postcard.message.slice(0, 42)
-                    : "Tap to open your postcard."}
-                  {postcard.message?.length > 42 ? "..." : ""}
-                </p>
+            const isBeatInvite =
+              postcard.type === "beatArenaInvite";
 
-                {postcard.gift && (
-                  <small>
-                    🎁 Gift attached: {postcard.gift.name}
-                  </small>
+            const isGameInvite = isMoonInvite || isBeatInvite;
+
+            return (
+              <button
+                className={`mail-inbox-card ${
+                  isGameInvite ? "moon-invite-mail" : ""
+                }`}
+                key={postcard.id}
+                onClick={() => openPostcard(postcard)}
+              >
+                <div className="mail-icon">
+                  {isBeatInvite ? "🎵" : "💌"}
+
+                  {!postcard.read && (
+                    <span className="mail-unread-dot" />
+                  )}
+                </div>
+
+                <div>
+                  <span>
+                    {isMoonInvite
+                      ? "Moon Village Invite"
+                      : isBeatInvite
+                      ? "Beat Arena Invite"
+                      : "Postcard"}
+                  </span>
+
+                  <strong>
+                    {isGameInvite
+                      ? `${postcard.fromUsername || "Friend"} invited you`
+                      : `From ${postcard.fromUsername || "Friend"}`}
+                  </strong>
+
+                  <p>
+                    {postcard.message
+                      ? postcard.message.slice(0, 42)
+                      : "Tap to open your postcard."}
+
+                    {postcard.message?.length > 42 ? "..." : ""}
+                  </p>
+
+                  {postcard.gift && (
+                    <small>
+                      🎁 Gift attached: {postcard.gift.name}
+                    </small>
+                  )}
+                </div>
+
+                {isMoonInvite ? (
+                  <div className="moon-invite-thumb">🌕</div>
+                ) : isBeatInvite ? (
+                  <div className="moon-invite-thumb">🎵</div>
+                ) : (
+                  postcard.cardImage && (
+                    <img
+                      src={postcard.cardImage}
+                      alt=""
+                      className="mail-thumb"
+                    />
+                  )
                 )}
-              </div>
-
-              {postcard.type === "moonVillageInvite" ? (
-                <div className="moon-invite-thumb">🌕</div>
-              ) : (
-                postcard.cardImage && (
-                  <img
-                    src={postcard.cardImage}
-                    alt=""
-                    className="mail-thumb"
-                  />
-                )
-              )}
-            </button>
-          ))}
+              </button>
+            );
+          })}
 
           {mailbox.map((mail) => (
             <div className="mail-inbox-card" key={mail.id}>
@@ -5021,63 +5080,116 @@ return (
     </button>
 
     {openedPostcard.type === "moonVillageInvite" ? (
-      <div className="moon-invite-reader-card">
-        <div className="moon-invite-big">🌕</div>
+        <div className="moon-invite-reader-card">
+          <div className="moon-invite-big">🌕</div>
 
-        <p className="phase-label">Moon Village Invite</p>
+          <p className="phase-label">Moon Village Invite</p>
 
-        <h2>{openedPostcard.fromUsername || "Friend"} invited you</h2>
+          <h2>
+            {openedPostcard.fromUsername || "Friend"} invited you
+          </h2>
 
-        <p>
-          Join their Moon Village room and play Werewolf together.
-        </p>
+          <p>
+            Join their Moon Village room and play Werewolf together.
+          </p>
 
-        <div className="moon-invite-code">
-          <span>Room Code</span>
-          <strong>{openedPostcard.roomCode}</strong>
-        </div>
-
-        <button onClick={() => acceptMoonVillageInvite(openedPostcard)}>
-          Join Room
-        </button>
-
-        <small>
-          From {openedPostcard.fromUsername || "Friend"}
-        </small>
-      </div>
-    ) : (
-      <>
-        <div className="postcard-layout postcard-reader-card">
-          <img
-            src={openedPostcard.cardImage}
-            alt="Opened postcard"
-            className="postcard-reader-image"
-          />
-
-          <p>{openedPostcard.message}</p>
-        </div>
-
-        {openedPostcard.gift && (
-          <div className="postcard-gift-claim">
-            <p>
-              🎁 {openedPostcard.gift.name}
-            </p>
-
-            {openedPostcard.gift.claimed ? (
-              <strong>Gift Claimed ✓</strong>
-            ) : (
-              <button onClick={() => claimPostcardGift(openedPostcard)}>
-                Claim Gift
-              </button>
-            )}
+          <div className="moon-invite-code">
+            <span>Room Code</span>
+            <strong>{openedPostcard.roomCode}</strong>
           </div>
-        )}
 
-        <small>
-          From {openedPostcard.fromUsername || "Friend"}
-        </small>
-      </>
-    )}
+          <button
+            onClick={() =>
+              acceptMoonVillageInvite(openedPostcard)
+            }
+          >
+            Join Room
+          </button>
+
+          <small>
+            From {openedPostcard.fromUsername || "Friend"}
+          </small>
+        </div>
+      ) : openedPostcard.type === "beatArenaInvite" ? (
+        <div className="moon-invite-reader-card">
+          <div className="moon-invite-big">🎵</div>
+
+          <p className="phase-label">Momo Beat Arena Invite</p>
+
+          <h2>
+            {openedPostcard.fromUsername || "Friend"} invited you
+          </h2>
+
+          <p>
+            Join their{" "}
+            {openedPostcard.mode === "coop"
+              ? "Co-op"
+              : "Battle"}{" "}
+            room and play together.
+          </p>
+
+          <div className="moon-invite-code">
+            <span>Room Code</span>
+            <strong>{openedPostcard.roomCode}</strong>
+          </div>
+
+          <button
+            onClick={() =>
+              acceptBeatArenaInvite(openedPostcard)
+            }
+          >
+            Join Room
+          </button>
+
+          <button
+            type="button"
+            className="secondary-btn"
+            onClick={() => setOpenedPostcard(null)}
+          >
+            Not Now
+          </button>
+
+          <small>
+            From {openedPostcard.fromUsername || "Friend"}
+          </small>
+        </div>
+      ) : (
+        <>
+          <div className="postcard-layout postcard-reader-card">
+            <img
+              src={openedPostcard.cardImage}
+              alt="Opened postcard"
+              className="postcard-reader-image"
+            />
+
+            <p>{openedPostcard.message}</p>
+          </div>
+
+          {openedPostcard.gift && (
+            <div className="postcard-gift-claim">
+              <p>
+                🎁 {openedPostcard.gift.name}
+              </p>
+
+              {openedPostcard.gift.claimed ? (
+                <strong>Gift Claimed ✓</strong>
+              ) : (
+                <button
+                  onClick={() =>
+                    claimPostcardGift(openedPostcard)
+                  }
+                >
+                  Claim Gift
+                </button>
+              )}
+            </div>
+          )}
+
+          <small>
+            From {openedPostcard.fromUsername || "Friend"}
+          </small>
+        </>
+      )}
   </div>
 )}
 

@@ -56,10 +56,10 @@ export default function Arcade({
       sub: "Werewolf Online",
     },
     {
-      id: "lantern-league",
-      title: "Lantern League",
-      img: "/assets/arcade/coming-soon.png",
-      sub: "Coming Soon",
+      id: "momo-beat-arena",
+      title: "Beat Arena",
+      img: "/assets/arcade/beat-arena.png",
+      sub: "Online Rhythm Battle",
     },
     {
       id: "bombu-garden",
@@ -118,7 +118,19 @@ export default function Arcade({
             key={game.id}
             className="arcade-full-card"
             onClick={() => {
-              if (game.id.includes("soon") || game.id !== "werewolf" && tab === "online") return;
+              const playableOnlineGames = [
+                "werewolf",
+                "momo-beat-arena",
+              ];
+
+              if (game.id.includes("soon")) return;
+
+              if (
+                tab === "online" &&
+                !playableOnlineGames.includes(game.id)
+              ) {
+                return;
+              }
 
               if (tab === "offline") {
                 onOpenOfflineGame(game.id);
