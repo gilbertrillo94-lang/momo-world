@@ -15,6 +15,10 @@ import {
 } from "firebase/firestore";
 import { db } from "../../firebase";
 import "./MomoBeatArena.css";
+import {
+  generateBeatmap,
+  prewarmBeatmap,
+} from "./beatmapGenerator";
 
 const MAX_PLAYERS = 6;
 const APPROACH_MS = 1550;
@@ -402,58 +406,7 @@ function gradeFrom(accuracy) {
   return "D";
 }
 
-function createChart(song, difficulty = "NORMAL") {
-  const beat = 60000 / song.bpm;
-  const hard = difficulty === "HARD" || difficulty === "EXPERT";
 
-  const normalPatterns = [
-    [0], [1], [2], [3],
-    [0], [2], [1], [3],
-    [0, 3], [1, 2],
-    [0], [1], [2], [3],
-    [0, 2], [1, 3],
-  ];
-
-  const hardPatterns = [
-    [0], [1], [2], [3],
-    [0, 2], [1, 3],
-    [0, 3], [1, 2],
-    [0], [1, 2], [3], [0, 3],
-    [0, 1], [2, 3],
-    [1], [2],
-  ];
-
-  const patterns = hard ? hardPatterns : normalPatterns;
-  const interval =
-    difficulty === "EASY"
-      ? beat * 1.25
-      : difficulty === "EXPERT"
-      ? beat / 2.5
-      : hard
-      ? beat / 2
-      : beat;
-  const notes = [];
-
-  let time = 3200;
-  let patternIndex = 0;
-
-  while (time < song.duration * 1000 - 1200) {
-    const pattern = patterns[patternIndex % patterns.length];
-
-    pattern.forEach((lane) => {
-      notes.push({
-        id: `${song.id}-${patternIndex}-${lane}`,
-        lane,
-        time,
-      });
-    });
-
-    patternIndex += 1;
-    time += interval;
-  }
-
-  return notes;
-}
 
 function normalizePlayer(uid, data = {}) {
   return {
@@ -471,6 +424,7 @@ function normalizePlayer(uid, data = {}) {
     great: Number(data.great || 0),
     good: Number(data.good || 0),
     miss: Number(data.miss || 0),
+    beatmapReady: Boolean(data.beatmapReady),
     finished: Boolean(data.finished),
   };
 }
@@ -507,6 +461,8 @@ export default function MomoBeatArena({
   const [hasForfeited, setHasForfeited] = useState(false);
   const [resultRows, setResultRows] = useState([]);
 
+  const [beatmapLoading, setBeatmapLoading] = useState(false);
+
   const canvasRef = useRef(null);
   const audioRef = useRef(null);
   const chatMessagesRef = useRef(null);
@@ -532,6 +488,7 @@ export default function MomoBeatArena({
   const lastLiveSyncRef = useRef(0);
   const lastHudSyncRef = useRef(0);
   const pausedRef = useRef(false);
+  const inviteJoinAttemptedRef = useRef(false);
 
   const currentUser = useMemo(
     () => ({
@@ -649,7 +606,16 @@ useEffect(() => {
 
   useEffect(() => {
     async function joinFromInvite() {
-      if (!initialRoomCode || !currentUser.uid || roomId) return;
+      if (
+  !initialRoomCode ||
+  !currentUser.uid ||
+  roomId ||
+  inviteJoinAttemptedRef.current
+) {
+  return;
+}
+
+inviteJoinAttemptedRef.current = true;
 
       const code = initialRoomCode.trim().toUpperCase();
       if (!code) return;
@@ -676,6 +642,7 @@ useEffect(() => {
             name: currentUser.name,
             avatar: currentUser.avatar,
             ready: false,
+            beatmapReady: false,
             voteSongId: roomData.songId || SONGS[0].id,
             voteDifficulty: roomData.difficulty || "NORMAL",
             ...emptyStats(),
@@ -759,6 +726,14 @@ useEffect(() => {
   useEffect(() => {
     if (!room || !roomId) return;
 
+    if (room.songId) {
+  setSelectedSongId(room.songId);
+}
+
+if (room.difficulty) {
+  setSelectedDifficulty(room.difficulty);
+}
+
     if (
       room.status === "playing" &&
       room.startAt &&
@@ -774,6 +749,78 @@ useEffect(() => {
       setScreen("results");
     }
   }, [players, room, roomId, screen]);
+
+useEffect(() => {
+  if (
+    mode === "solo" ||
+    !roomId ||
+    room?.status !== "preparing" ||
+    !room?.songId ||
+    !currentRoomPlayer ||
+    currentRoomPlayer.beatmapReady
+  ) {
+    return;
+  }
+
+  let cancelled = false;
+
+  async function prepareOnlineBeatmap() {
+    const song =
+      SONGS.find((item) => item.id === room.songId) ||
+      SONGS[0];
+
+    const difficulty =
+      room.difficulty || "NORMAL";
+
+    setBeatmapLoading(true);
+    setMessage("Creating automatic beatmap...");
+
+    try {
+      await prewarmBeatmap(song, difficulty);
+
+      if (cancelled) return;
+
+      await updateDoc(
+        doc(
+          db,
+          "momoBeatRooms",
+          roomId,
+          "players",
+          currentUser.uid
+        ),
+        {
+          beatmapReady: true,
+        }
+      );
+
+      setMessage("Beatmap ready. Waiting for players...");
+    } catch (error) {
+      console.error(error);
+
+      if (!cancelled) {
+        setMessage("Could not prepare the automatic beatmap.");
+      }
+    } finally {
+      if (!cancelled) {
+        setBeatmapLoading(false);
+      }
+    }
+  }
+
+  prepareOnlineBeatmap();
+
+  return () => {
+    cancelled = true;
+  };
+}, [
+  currentRoomPlayer,
+  currentUser.uid,
+  mode,
+  room?.difficulty,
+  room?.songId,
+  room?.status,
+  roomId,
+]);
 
   const createRoom = useCallback(
     async (roomMode) => {
@@ -800,6 +847,7 @@ useEffect(() => {
           name: currentUser.name,
           avatar: currentUser.avatar,
           ready: false,
+          beatmapReady: false,
           voteSongId: selectedSongId,
           voteDifficulty: selectedDifficulty,
           ...emptyStats(),
@@ -852,6 +900,7 @@ useEffect(() => {
         name: currentUser.name,
         avatar: currentUser.avatar,
         ready: false,
+        beatmapReady: false,
         voteSongId: roomData.songId || SONGS[0].id,
         voteDifficulty: roomData.difficulty || "NORMAL",
         ...emptyStats(),
@@ -868,7 +917,7 @@ useEffect(() => {
 
   const leaveRoom = useCallback(async () => {
     if (!roomId) {
-      setScreen(mode === "solo" ? "home" : `${mode}Home`);
+      setScreen("home");
       return;
     }
 
@@ -890,7 +939,7 @@ useEffect(() => {
     setShowInvitePanel(false);
     setInvitedFriends({});
     setRoomCodeCopied(false);
-    setScreen(`${mode}Home`);
+    setScreen("home");
   }, [currentUser.uid, isHost, mode, roomId]);
 
   const loadFriends = useCallback(async () => {
@@ -1077,18 +1126,29 @@ useEffect(() => {
 );
 
   const voteDifficulty = useCallback(
-    async (difficulty) => {
-      setSelectedDifficulty(difficulty);
+  async (difficulty) => {
+    setSelectedDifficulty(difficulty);
 
-      if (!roomId) return;
+    if (!roomId) return;
 
+    await updateDoc(
+      doc(db, "momoBeatRooms", roomId, "players", currentUser.uid),
+      {
+        voteDifficulty: difficulty,
+      }
+    );
+
+    if (isHost) {
       await updateDoc(
-        doc(db, "momoBeatRooms", roomId, "players", currentUser.uid),
-        { voteDifficulty: difficulty }
+        doc(db, "momoBeatRooms", roomId),
+        {
+          difficulty,
+        }
       );
-    },
-    [currentUser.uid, roomId]
-  );
+    }
+  },
+  [currentUser.uid, isHost, roomId]
+);
 
   const winningVoteDifficulty = useCallback(() => {
     const totals = new Map();
@@ -1123,45 +1183,90 @@ useEffect(() => {
   }, [players, selectedSongId]);
 
   const startOnlineMatch = useCallback(async () => {
-    if (!roomId || !isHost) return;
+  if (!roomId || !isHost) return;
 
-    if (players.length < 2) {
-      setMessage("At least two players are required.");
-      return;
-    }
+  if (players.length < 2) {
+    setMessage("At least two players are required.");
+    return;
+  }
 
-    if (!players.every((player) => player.ready)) {
-      setMessage("Everyone must be ready.");
-      return;
-    }
+  if (!players.every((player) => player.ready)) {
+    setMessage("Everyone must be ready.");
+    return;
+  }
 
-    setMessage("");
+  setMessage("Preparing beatmaps...");
 
-    const songId = winningVoteSong();
-    const difficulty = winningVoteDifficulty();
-    const startAt = Date.now() + 4200;
+  const songId = winningVoteSong();
+  const difficulty = winningVoteDifficulty();
 
-    await Promise.all(
-      players.map((player) =>
-        updateDoc(
-          doc(db, "momoBeatRooms", roomId, "players", player.uid),
-          {
-            ...emptyStats(),
-            accuracy: 100,
-            finished: false,
-            ready: false,
-          }
-        )
+  await Promise.all(
+    players.map((player) =>
+      updateDoc(
+        doc(
+          db,
+          "momoBeatRooms",
+          roomId,
+          "players",
+          player.uid
+        ),
+        {
+          ...emptyStats(),
+          accuracy: 100,
+          finished: false,
+          ready: false,
+          beatmapReady: false,
+        }
       )
-    );
+    )
+  );
 
-    await updateDoc(doc(db, "momoBeatRooms", roomId), {
-      status: "playing",
+  await updateDoc(
+    doc(db, "momoBeatRooms", roomId),
+    {
+      status: "preparing",
       songId,
       difficulty,
-      startAt,
-    });
-  }, [isHost, players, roomId, winningVoteDifficulty, winningVoteSong]);
+      startAt: null,
+    }
+  );
+}, [
+  isHost,
+  players,
+  roomId,
+  winningVoteDifficulty,
+  winningVoteSong,
+]);
+
+useEffect(() => {
+  if (
+    !isHost ||
+    !roomId ||
+    room?.status !== "preparing" ||
+    players.length === 0
+  ) {
+    return;
+  }
+
+  const everyoneBeatmapReady = players.every(
+    (player) => player.beatmapReady
+  );
+
+  if (!everyoneBeatmapReady) return;
+
+  updateDoc(doc(db, "momoBeatRooms", roomId), {
+    status: "playing",
+    startAt: Date.now() + 4200,
+  }).catch((error) => {
+    console.error(error);
+    setMessage("Could not start the match.");
+  });
+}, [
+  isHost,
+  players,
+  room?.status,
+  roomId,
+]);
 
   const publishLiveScore = useCallback(async () => {
     if (!roomId || mode === "solo") return;
@@ -1652,145 +1757,182 @@ if (
   }, [pressLane, releaseLane]);
 
   const startEngine = useCallback(
-    async (song, scheduledStart) => {
-      stopEngine();
+  async (song, scheduledStart) => {
+    stopEngine();
 
-      finishedRef.current = false;
-      startedRef.current = true;
-      pausedRef.current = false;
-      statsRef.current = emptyStats();
+    finishedRef.current = false;
+    startedRef.current = true;
+    pausedRef.current = false;
+    statsRef.current = emptyStats();
 
-      setGameStats(emptyStats());
-      setRemaining(song.duration);
-      setPaused(false);
-      setMessage("");
+    setGameStats(emptyStats());
+    setRemaining(song.duration);
+    setPaused(false);
+    setMessage("");
 
-      const engineDifficulty =
-        mode === "solo" ? selectedDifficulty : room?.difficulty || selectedDifficulty;
-      chartRef.current = createChart(song, engineDifficulty);
-      visibleNotesRef.current = [];
-      nextNoteIndexRef.current = 0;
-      pressedLanesRef.current.clear();
+const engineDifficulty =
+  mode === "solo"
+    ? selectedDifficulty
+    : room?.difficulty || selectedDifficulty;
 
-      const audio = new Audio(song.audio);
-      audio.preload = "auto";
-      audio.volume = 0.88;
-      audioRef.current = audio;
+let generatedBeatmap;
 
-      const wait = Math.max(0, scheduledStart - Date.now());
+try {
+  generatedBeatmap = await prewarmBeatmap(
+    song,
+    engineDifficulty
+  );
+} catch (error) {
+      console.error(error);
+      startedRef.current = false;
+      setMessage("The automatic beatmap could not be created.");
+      return;
+    }
 
-      [3, 2, 1].forEach((number, index) => {
-        countdownTimersRef.current.push(
-          window.setTimeout(
-            () => setCountdown(number),
-            wait + index * 800
-          )
-        );
-      });
+    chartRef.current = generatedBeatmap.notes;
+    visibleNotesRef.current = [];
+    nextNoteIndexRef.current = 0;
+    pressedLanesRef.current.clear();
 
+    const audio = new Audio(song.audio);
+    audio.preload = "auto";
+    audio.volume = 0.88;
+    audioRef.current = audio;
+
+    setRemaining(
+      generatedBeatmap.duration || song.duration
+    );
+
+    setMessage("");
+
+    const wait = Math.max(
+      0,
+      scheduledStart - Date.now()
+    );
+
+    [3, 2, 1].forEach((number, index) => {
       countdownTimersRef.current.push(
-        window.setTimeout(async () => {
-          setCountdown(null);
+        window.setTimeout(
+          () => setCountdown(number),
+          wait + index * 800
+        )
+      );
+    });
 
-          try {
-            await audio.play();
-          } catch {
-            setMessage(
-              "The song could not start. Check the MP3 path."
-            );
+    countdownTimersRef.current.push(
+      window.setTimeout(async () => {
+        setCountdown(null);
+
+        try {
+          await audio.play();
+        } catch (error) {
+          console.error(error);
+          startedRef.current = false;
+          setMessage(
+            "The song could not start. Check the MP3 path."
+          );
+          return;
+        }
+
+        function frame() {
+          if (
+            !audioRef.current ||
+            finishedRef.current ||
+            pausedRef.current
+          ) {
             return;
           }
 
-          function frame() {
-            if (
-              !audioRef.current ||
-              finishedRef.current ||
-              pausedRef.current
-            ) {
-              return;
-            }
+          const currentMs =
+            audioRef.current.currentTime * 1000;
 
-            const currentMs =
-              audioRef.current.currentTime * 1000;
-
-            while (
-              nextNoteIndexRef.current < chartRef.current.length &&
-              chartRef.current[nextNoteIndexRef.current].time <=
-                currentMs + APPROACH_MS
-            ) {
-              visibleNotesRef.current.push({
-                ...chartRef.current[nextNoteIndexRef.current],
-                judged: false,
-              });
-
-              nextNoteIndexRef.current += 1;
-            }
-
-            visibleNotesRef.current.forEach((note) => {
-              if (
-                !note.judged &&
-                currentMs - note.time > HIT_WINDOWS.miss
-              ) {
-                note.judged = true;
-                registerMiss();
-              }
+          while (
+            nextNoteIndexRef.current <
+              chartRef.current.length &&
+            chartRef.current[
+              nextNoteIndexRef.current
+            ].time <=
+              currentMs + APPROACH_MS
+          ) {
+            visibleNotesRef.current.push({
+              ...chartRef.current[
+                nextNoteIndexRef.current
+              ],
+              judged: false,
             });
 
-            visibleNotesRef.current =
-              visibleNotesRef.current.filter(
-                (note) =>
-                  !note.judged ||
-                  currentMs - note.time <
-                    HIT_WINDOWS.miss + 90
-              );
-
-            const duration =
-              audioRef.current.duration || song.duration;
-
-            setRemaining(
-              Math.max(
-                0,
-                duration - audioRef.current.currentTime
-              )
-            );
-
-            publishLiveScore().catch(console.warn);
-            drawCanvas();
-
-            if (
-              audioRef.current.ended ||
-              currentMs >= song.duration * 1000 ||
-              (nextNoteIndexRef.current >=
-                chartRef.current.length &&
-                visibleNotesRef.current.every(
-                  (note) => note.judged
-                ))
-            ) {
-              finishGame();
-              return;
-            }
-
-            animationFrameRef.current =
-              window.requestAnimationFrame(frame);
+            nextNoteIndexRef.current += 1;
           }
 
-          frameLoopRef.current = frame;
+          visibleNotesRef.current.forEach((note) => {
+            if (
+              !note.judged &&
+              currentMs - note.time >
+                HIT_WINDOWS.miss
+            ) {
+              note.judged = true;
+              registerMiss();
+            }
+          });
+
+          visibleNotesRef.current =
+            visibleNotesRef.current.filter(
+              (note) =>
+                !note.judged ||
+                currentMs - note.time <
+                  HIT_WINDOWS.miss + 90
+            );
+
+          const duration =
+            audioRef.current.duration ||
+            generatedBeatmap.duration ||
+            song.duration;
+
+          setRemaining(
+            Math.max(
+              0,
+              duration -
+                audioRef.current.currentTime
+            )
+          );
+
+          publishLiveScore().catch(console.warn);
+          drawCanvas();
+
+          if (
+            audioRef.current.ended ||
+            currentMs >= duration * 1000 ||
+            (nextNoteIndexRef.current >=
+              chartRef.current.length &&
+              visibleNotesRef.current.every(
+                (note) => note.judged
+              ))
+          ) {
+            finishGame();
+            return;
+          }
+
           animationFrameRef.current =
             window.requestAnimationFrame(frame);
-        }, wait + 2400)
-      );
-    },
-    [
-      drawCanvas,
-      finishGame,
-      publishLiveScore,
-      registerMiss,
-      room?.difficulty,
-      mode,
-      selectedDifficulty,
-      stopEngine,
-    ]
-  );
+        }
+
+        frameLoopRef.current = frame;
+        animationFrameRef.current =
+          window.requestAnimationFrame(frame);
+      }, wait + 2400)
+    );
+  },
+  [
+    drawCanvas,
+    finishGame,
+    mode,
+    publishLiveScore,
+    registerMiss,
+    room?.difficulty,
+    selectedDifficulty,
+    stopEngine,
+  ]
+);
 
   useEffect(() => {
     if (screen !== "game" || startedRef.current) return;
@@ -1873,10 +2015,32 @@ const chooseRandomSong = useCallback(() => {
     setScreen("difficulty");
   }, []);
 
-  const confirmSoloDifficulty = useCallback(() => {
+  const confirmSoloDifficulty = useCallback(async () => {
+  if (beatmapLoading) return;
+
+  setBeatmapLoading(true);
+  setMessage("Analyzing song and creating beatmap...");
+
+  try {
+    await prewarmBeatmap(
+      selectedSong,
+      selectedDifficulty
+    );
+
     startedRef.current = false;
+    setMessage("");
     setScreen("game");
-  }, []);
+  } catch (error) {
+    console.error(error);
+    setMessage("Could not prepare the automatic beatmap.");
+  } finally {
+    setBeatmapLoading(false);
+  }
+}, [
+  beatmapLoading,
+  selectedDifficulty,
+  selectedSong,
+]);
 
   const pauseSolo = useCallback(() => {
     if (mode !== "solo" || !audioRef.current) return;
@@ -2302,9 +2466,9 @@ const chooseRandomSong = useCallback(() => {
         type="button"
         className="mba-carousel-start"
         onClick={async () => {
-            if (songSelectionSource === "online") {
+           if (songSelectionSource === "online") {
             await voteSong(selectedSongId);
-            setScreen("lobby");
+            setScreen("difficulty");
             return;
             }
 
@@ -2343,7 +2507,27 @@ const chooseRandomSong = useCallback(() => {
             ))}
           </div>
         </main>
-        <div className="mba-song-bottom-bar"><button type="button" onClick={confirmSoloDifficulty}>START {selectedDifficulty}</button></div>
+       <div className="mba-song-bottom-bar">
+  <button
+    type="button"
+    onClick={async () => {
+    if (songSelectionSource === "online") {
+        await voteDifficulty(selectedDifficulty);
+        setScreen("lobby");
+        return;
+    }
+
+    confirmSoloDifficulty();
+    }}
+    disabled={beatmapLoading}
+  >
+    {beatmapLoading
+    ? "CREATING BEATMAP..."
+    : songSelectionSource === "online"
+        ? `CHOOSE ${selectedDifficulty}`
+        : `START ${selectedDifficulty}`}
+  </button>
+</div>
       </section>
     );
   }
@@ -2620,6 +2804,7 @@ const lobbySlots = Array.from(
         </div>
         </div>
 
+{isHost && (
         <button
             type="button"
             className="mba-o2-change-song"
@@ -2632,6 +2817,7 @@ const lobbySlots = Array.from(
         <strong>CHANGE SONG</strong>
         <em>›</em>
         </button>
+        )}
     </div>
 
     <div className="mba-o2-setting-row">
