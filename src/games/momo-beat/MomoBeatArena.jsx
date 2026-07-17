@@ -487,6 +487,7 @@ export default function MomoBeatArena({
   const [selectedDifficulty, setSelectedDifficulty] = useState("NORMAL");
   const [songSelectionSource, setSongSelectionSource] = useState("solo");
   const [roomCodeInput, setRoomCodeInput] = useState("");
+  const [showJoinRoomPopup, setShowJoinRoomPopup] = useState(false);
   const [roomId, setRoomId] = useState(null);
   const [room, setRoom] = useState(null);
   const [players, setPlayers] = useState([]);
@@ -814,8 +815,8 @@ useEffect(() => {
     [currentUser, selectedDifficulty, selectedSongId]
   );
 
-  const joinRoom = useCallback(async () => {
-    const code = roomCodeInput.trim().toUpperCase();
+  const joinRoom = useCallback(async (enteredCode = roomCodeInput) => {
+  const code = enteredCode.trim().toUpperCase();
 
     if (!code) {
       setMessage("Enter a room code.");
@@ -1936,169 +1937,231 @@ const chooseRandomSong = useCallback(() => {
   }, [currentUser, gameStats.score, mode, players]);
 
   if (screen === "home") {
-    return (
-      <section className="mba-app mba-mode-screen">
-        <div className="mba-background-art" />
-
-        <header className="mba-mode-header">
-          <button
-            type="button"
-            className="mba-round-button"
-            onClick={onExit}
-            aria-label="Return to Momo World"
-          >
-            ←
-          </button>
-
-          <span>MOMO WORLD MUSIC GAME</span>
-        </header>
-
-        <main className="mba-mode-content">
-          <div className="mba-brand">
-            <span>MOMO</span>
-            <h1>BEAT ARENA</h1>
-            <p>Tap the beat. Own the score.</p>
-          </div>
-
-          <div className="mba-mode-cards">
-            <button
-              type="button"
-              className="mba-mode-card mba-solo-card"
-              onClick={startSolo}
-            >
-              <span className="mba-mode-number">01</span>
-              <div>
-                <small>PLAY YOUR WAY</small>
-                <strong>SOLO</strong>
-              </div>
-              <span className="mba-mode-arrow">›</span>
-            </button>
-
-            <button
-              type="button"
-              className="mba-mode-card mba-battle-card"
-              onClick={() => openOnlineMode("battle")}
-            >
-              <span className="mba-mode-number">02</span>
-              <div>
-                <small>HIGHEST SCORE WINS</small>
-                <strong>BATTLE</strong>
-              </div>
-              <span className="mba-mode-arrow">›</span>
-            </button>
-
-            <button
-              type="button"
-              className="mba-mode-card mba-coop-card"
-              onClick={() => openOnlineMode("coop")}
-            >
-              <span className="mba-mode-number">03</span>
-              <div>
-                <small>COMBINE YOUR SCORES</small>
-                <strong>CO-OP</strong>
-              </div>
-              <span className="mba-mode-arrow">›</span>
-            </button>
-          </div>
-
-          <section className="mba-lobby-section">
-            <div className="mba-section-title">
-              <span>DIFFICULTY VOTE</span>
-              <small>Same chart for everyone</small>
-            </div>
-            <div className="mba-difficulty-votes">
-              {["EASY", "NORMAL", "HARD", "EXPERT"].map((difficulty) => {
-                const votes = players.filter((player) => player.voteDifficulty === difficulty).length;
-                return (
-                  <button type="button" key={difficulty} className={currentRoomPlayer?.voteDifficulty === difficulty ? "selected" : ""} onClick={() => voteDifficulty(difficulty)}>
-                    <strong>{difficulty}</strong><span>{votes} VOTE{votes === 1 ? "" : "S"}</span>
-                  </button>
-                );
-              })}
-            </div>
-          </section>
-
-          {message && (
-            <div className="mba-inline-message">{message}</div>
-          )}
-        </main>
-      </section>
-    );
-  }
-
-  if (screen === "soloHome") {
-    return (
-      <section className="mba-app mba-entry-screen mba-entry-solo">
-        <div className="mba-entry-glow" />
-        <header className="mba-mobile-header">
-          <button type="button" className="mba-round-button" onClick={() => setScreen("home")}>←</button>
-          <div><small>BEAT ARENA</small><strong>SOLO</strong></div>
-        </header>
-        <main className="mba-entry-content">
-          <div className="mba-entry-hero">
-            <span>PLAY AT YOUR PACE</span>
-            <h1>CHASE YOUR<br />BEST SCORE.</h1>
-            <p>Choose a song, select a difficulty, and master the four-lane touch highway.</p>
-          </div>
-          <div className="mba-entry-stats">
-            <article><small>CONTROL</small><strong>4 TOUCH LANES</strong></article>
-            <article><small>SCORING</small><strong>ACCURACY + COMBO</strong></article>
-            <article><small>RESULT</small><strong>PERSONAL RECORD</strong></article>
-          </div>
-        </main>
-        <footer className="mba-entry-footer">
-          <button
+  return (
+    <section className="mba-app mba-new-home-screen">
+      <button
         type="button"
-        className="mba-entry-primary"
-        onClick={() => {
-            setSongSelectionSource("solo");
-            setScreen("songs");
-        }}
+        className="mba-new-home-exit"
+        onClick={onExit}
+        aria-label="Exit Momo Beat Arena"
+      >
+        ←
+      </button>
+
+      <div className="mba-new-home-buttons">
+        <button
+          type="button"
+          className="mba-new-mode-button"
+          onClick={() => {
+            setMode("solo");
+            setScreen("soloHome");
+          }}
+          aria-label="Open Solo mode"
         >
-        SELECT A SONG
+          <img
+            src="/momo-beat/buttons/solo.png"
+            alt="Solo"
+            draggable="false"
+          />
         </button>
-        </footer>
-      </section>
-    );
-  }
+
+        <button
+          type="button"
+          className="mba-new-mode-button"
+          onClick={() => {
+            setMode("battle");
+            setScreen("battleHome");
+          }}
+          aria-label="Open Battle mode"
+        >
+          <img
+            src="/momo-beat/buttons/battle.png"
+            alt="Battle"
+            draggable="false"
+          />
+        </button>
+
+        <button
+          type="button"
+          className="mba-new-mode-button"
+          onClick={() => {
+            setMode("coop");
+            setScreen("coopHome");
+          }}
+          aria-label="Open Co-op mode"
+        >
+          <img
+            src="/momo-beat/buttons/coop.png"
+            alt="Co-op"
+            draggable="false"
+          />
+        </button>
+      </div>
+    </section>
+  );
+}
+
+ if (screen === "soloHome") {
+  return (
+    <section className="mba-app mba-new-solo-screen">
+      <button
+        type="button"
+        className="mba-new-solo-back"
+        onClick={() => setScreen("home")}
+        aria-label="Return to Momo Beat Arena home"
+      >
+        ←
+      </button>
+
+      <button
+        type="button"
+        className="mba-new-select-song-button"
+        onClick={() => {
+          setSongSelectionSource("solo");
+          setScreen("songs");
+        }}
+        aria-label="Select a song"
+      >
+        <img
+          src="/momo-beat/buttons/select-song.png"
+          alt="Select a Song"
+          draggable="false"
+        />
+      </button>
+    </section>
+  );
+}
 
   if (screen === "battleHome" || screen === "coopHome") {
-    const onlineMode = screen === "battleHome" ? "battle" : "coop";
-    const isBattle = onlineMode === "battle";
+  const onlineMode =
+    screen === "battleHome" ? "battle" : "coop";
 
-    return (
-      <section className={`mba-app mba-entry-screen ${isBattle ? "mba-entry-battle" : "mba-entry-coop"}`}>
-        <div className="mba-entry-glow" />
-        <header className="mba-mobile-header">
-          <button type="button" className="mba-round-button" onClick={() => setScreen("home")}>←</button>
-          <div><small>ONLINE MODE</small><strong>{isBattle ? "BATTLE" : "CO-OP"}</strong></div>
-        </header>
-        <main className="mba-entry-content">
-          <div className="mba-entry-hero">
-            <span>{isBattle ? "HIGHEST SCORE WINS" : "PLAY AS ONE TEAM"}</span>
-            <h1>{isBattle ? <>OUTSCORE<br />EVERYONE.</> : <>BUILD ONE<br />TEAM SCORE.</>}</h1>
-            <p>{isBattle ? "Everyone plays the same chart on their own screen. Final rankings appear after the song." : "Everyone plays the same chart on their own screen. All scores combine into one team result."}</p>
+  const isBattle = onlineMode === "battle";
+
+  return (
+    <section
+      className={`mba-app ${
+        isBattle
+          ? "mba-new-battle-screen"
+          : "mba-new-coop-screen"
+      }`}
+    >
+      <button
+        type="button"
+        className="mba-new-battle-back"
+        onClick={() => setScreen("home")}
+        aria-label="Return to Momo Beat Arena home"
+      >
+        ←
+      </button>
+
+      <div className="mba-new-battle-actions">
+        <button
+          type="button"
+          className="mba-new-battle-button"
+          onClick={() => createRoom(onlineMode)}
+          aria-label={`Create ${onlineMode} room`}
+        >
+          <img
+            src={
+              isBattle
+                ? "/momo-beat/buttons/create-room.png"
+                : "/momo-beat/buttons/create-room-coop.png"
+            }
+            alt="Create Room"
+            draggable="false"
+          />
+        </button>
+
+        <button
+        type="button"
+        className="mba-new-battle-button"
+        onClick={() => {
+            setMode(onlineMode);
+            setRoomCodeInput("");
+            setMessage("");
+            setShowJoinRoomPopup(true);
+        }}
+        aria-label={`Join ${onlineMode} room`}
+        >
+        <img
+            src="/momo-beat/buttons/join-room.png"
+            alt="Join Room"
+            draggable="false"
+        />
+        </button>
+      </div>
+
+      
+           
+
+      {showJoinRoomPopup && (
+        <div
+          className="mba-join-popup-backdrop"
+          onClick={() => setShowJoinRoomPopup(false)}
+        >
+          <div
+            className="mba-join-popup"
+            onClick={(event) => event.stopPropagation()}
+          >
+            <button
+              type="button"
+              className="mba-join-popup-close"
+              onClick={() => setShowJoinRoomPopup(false)}
+              aria-label="Close join room panel"
+            >
+              ×
+            </button>
+
+            <small>
+              {isBattle ? "BATTLE MODE" : "CO-OP MODE"}
+            </small>
+
+            <h2>ENTER ROOM CODE</h2>
+
+            <input
+              autoFocus
+              type="text"
+              value={roomCodeInput}
+              maxLength={5}
+              placeholder="ABCDE"
+              onChange={(event) =>
+                setRoomCodeInput(
+                  event.target.value
+                    .toUpperCase()
+                    .replace(/[^A-Z0-9]/g, "")
+                )
+              }
+              onKeyDown={(event) => {
+                if (event.key === "Enter") {
+                  joinRoom(roomCodeInput);
+                }
+              }}
+            />
+
+            {message && (
+              <div className="mba-join-popup-message">
+                {message}
+              </div>
+            )}
+
+            <button
+              type="button"
+              className="mba-join-popup-submit"
+              onClick={() => joinRoom(roomCodeInput)}
+            >
+              ENTER ROOM
+            </button>
           </div>
+        </div>
+      )}
 
-          <div className="mba-online-actions">
-            <button type="button" className="mba-entry-primary" onClick={() => createRoom(onlineMode)}>CREATE ROOM</button>
-            <div className="mba-room-code-entry">
-              <input value={roomCodeInput} maxLength={5} placeholder="ENTER ROOM CODE" onChange={(event) => setRoomCodeInput(event.target.value.toUpperCase())} />
-              <button type="button" onClick={joinRoom}>JOIN ROOM</button>
-            </div>
-          </div>
+    </section>
 
-          <div className="mba-entry-stats">
-            <article><small>PLAYERS</small><strong>2–{MAX_PLAYERS}</strong></article>
-            <article><small>CHOICE</small><strong>SONG + DIFFICULTY VOTE</strong></article>
-            <article><small>GAMEPLAY</small><strong>YOUR OWN SCREEN</strong></article>
-          </div>
 
-          {message && <div className="mba-inline-message">{message}</div>}
-        </main>
-      </section>
-    );
-  }
+
+  );
+}
 
   if (screen === "songs") {
   return (
