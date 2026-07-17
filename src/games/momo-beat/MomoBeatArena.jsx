@@ -511,6 +511,7 @@ export default function MomoBeatArena({
   const audioRef = useRef(null);
   const chatMessagesRef = useRef(null);
   const previewAudioRef = useRef(null);
+  const songSwipeStartXRef = useRef(null);
   const animationFrameRef = useRef(null);
   const frameLoopRef = useRef(null);
   const countdownTimersRef = useRef([]);
@@ -2195,7 +2196,33 @@ const chooseRandomSong = useCallback(() => {
       </header>
 
       <main className="mba-carousel-content">
-        <section className="mba-song-carousel-area">
+        <section
+  className="mba-song-carousel-area"
+  onTouchStart={(event) => {
+    songSwipeStartXRef.current =
+      event.touches[0]?.clientX ?? null;
+  }}
+  onTouchEnd={(event) => {
+    if (songSwipeStartXRef.current === null) return;
+
+    const endX =
+      event.changedTouches[0]?.clientX ??
+      songSwipeStartXRef.current;
+
+    const swipeDistance =
+      endX - songSwipeStartXRef.current;
+
+    songSwipeStartXRef.current = null;
+
+    if (Math.abs(swipeDistance) < 45) return;
+
+    if (swipeDistance < 0) {
+      moveSongCarousel(1);
+    } else {
+      moveSongCarousel(-1);
+    }
+  }}
+>
           <button
             type="button"
             className="mba-carousel-arrow mba-carousel-arrow-left"
