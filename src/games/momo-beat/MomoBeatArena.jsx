@@ -12,6 +12,7 @@ import {
   serverTimestamp,
   setDoc,
   updateDoc,
+  writeBatch,
 } from "firebase/firestore";
 import { db } from "../../firebase";
 import "./MomoBeatArena.css";
@@ -42,7 +43,7 @@ const SONGS = [
     title: "Someday Maybe",
     artist: "Element Beat",
     difficulty: "NORMAL",
-    duration: 237,
+    duration: 180,
     speed: 6.0,
     bpm: 96,
     audioOffset: 0,
@@ -76,7 +77,7 @@ const SONGS = [
     title: "Simpleng Tao",
     artist: "Element Beat",
     difficulty: "NORMAL",
-    duration: 244,
+    duration: 180,
     speed: 5.7,
     bpm: 150,
     audioOffset: 0,
@@ -110,7 +111,7 @@ const SONGS = [
     title: "Kimi Ga Kureta Mono",
     artist: "Element Beat",
     difficulty: "NORMAL",
-    duration: 358,
+    duration: 180,
     speed: 5.3,
     bpm: 90,
     audioOffset: 0,
@@ -127,7 +128,7 @@ const SONGS = [
     title: "Zen Zen",
     artist: "Element Beat",
     difficulty: "NORMAL",
-    duration: 284,
+    duration: 180,
     speed: 7.0,
     bpm: 190,
     audioOffset: 0,
@@ -145,7 +146,7 @@ const SONGS = [
     title: "We Are! One Piece",
     artist: "Element Beat",
     difficulty: "NORMAL",
-    duration: 242,
+    duration: 180,
     speed: 4.5,
     bpm: 130,
     audioOffset: 0,
@@ -162,7 +163,7 @@ const SONGS = [
     title: "Nandemonaiya Kimi No Nawa",
     artist: "Element Beat",
     difficulty: "NORMAL",
-    duration: 344,
+    duration: 180,
     speed: 6.6,
     bpm: 168,
     audioOffset: 0,
@@ -179,7 +180,7 @@ const SONGS = [
     title: "Only You (Miss A)",
     artist: "Element Beat",
     difficulty: "NORMAL",
-    duration: 201,
+    duration: 180,
     speed: 5.5,
     bpm: 168,
     audioOffset: 0,
@@ -196,7 +197,7 @@ const SONGS = [
     title: "Someday (IU)",
     artist: "Element Beat",
     difficulty: "NORMAL",
-    duration: 220,
+    duration: 180,
     speed: 5.5,
     bpm: 135,
     audioOffset: 0,
@@ -213,7 +214,7 @@ const SONGS = [
     title: "Dream High",
     artist: "Element Beat",
     difficulty: "NORMAL",
-    duration: 224,
+    duration: 180,
     speed: 5.5,
     bpm: 168,
     audioOffset: 0,
@@ -230,7 +231,7 @@ const SONGS = [
     title: "Mr. Chu",
     artist: "Element Beat",
     difficulty: "NORMAL",
-    duration: 205,
+    duration: 180,
     speed: 5.5,
     bpm: 168,
     audioOffset: 0,
@@ -247,7 +248,7 @@ const SONGS = [
     title: "You and I (IU)",
     artist: "Element Beat",
     difficulty: "NORMAL",
-    duration: 223,
+    duration: 180,
     speed: 5.5,
     bpm: 168,
     audioOffset: 0,
@@ -316,7 +317,7 @@ const SONGS = [
     title: "Join Us for a Bite (FNAF)",
     artist: "Element Beat",
     difficulty: "NORMAL",
-    duration: 251,
+    duration: 180,
     speed: 3.5,
     bpm: 130,
     audioOffset: 0,
@@ -373,6 +374,10 @@ function clamp(value, min, max) {
   return Math.max(min, Math.min(max, value));
 }
 
+function makeRoundId() {
+  return `round-${Date.now()}-${Math.random().toString(36).slice(2, 10)}`;
+}
+
 function makeRoomCode() {
   const chars = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
   return Array.from(
@@ -425,7 +430,9 @@ function normalizePlayer(uid, data = {}) {
     good: Number(data.good || 0),
     miss: Number(data.miss || 0),
     beatmapReady: Boolean(data.beatmapReady),
+    preparedRoundId: data.preparedRoundId || null,
     finished: Boolean(data.finished),
+    finishedRoundId: data.finishedRoundId || null,
   };
 }
 
@@ -465,6 +472,7 @@ export default function MomoBeatArena({
 
   const canvasRef = useRef(null);
   const audioRef = useRef(null);
+  const preparedAudioRef = useRef(null);
   const chatMessagesRef = useRef(null);
   const previewAudioRef = useRef(null);
   const songSwipeStartXRef = useRef(null);
@@ -472,6 +480,7 @@ export default function MomoBeatArena({
   const frameLoopRef = useRef(null);
   const countdownTimersRef = useRef([]);
   const chartRef = useRef([]);
+const preparedBeatmapRef = useRef(null);
   const visibleNotesRef = useRef([]);
   const nextNoteIndexRef = useRef(0);
   const pressedLanesRef = useRef(new Set());
@@ -484,20 +493,45 @@ export default function MomoBeatArena({
 });
   const statsRef = useRef(emptyStats());
   const startedRef = useRef(false);
+  const startedRoundIdRef = useRef(null);
+  const preparedRoundIdRef = useRef(null);
+  const publishedRoundIdRef = useRef(null);
   const finishedRef = useRef(false);
   const lastLiveSyncRef = useRef(0);
+  const liveSyncInFlightRef = useRef(false);
   const lastHudSyncRef = useRef(0);
   const pausedRef = useRef(false);
   const inviteJoinAttemptedRef = useRef(false);
 
-  const currentUser = useMemo(
-    () => ({
-      uid: user?.uid || "local-player",
-      name: user?.displayName || user?.name || "Player",
-      avatar: momoImage,
-    }),
-    [momoImage, user]
+  const currentUser = useMemo(() => {
+  let fallbackUid = localStorage.getItem(
+    "momo-beat-player-uid"
   );
+
+  if (!fallbackUid) {
+  const randomId =
+    window.crypto?.randomUUID?.() ||
+    `${Date.now()}-${Math.random()
+      .toString(36)
+      .slice(2, 10)}`;
+
+  fallbackUid = `local-${randomId}`;
+
+  localStorage.setItem(
+    "momo-beat-player-uid",
+    fallbackUid
+  );
+}
+
+  return {
+    uid: user?.uid || fallbackUid,
+    name:
+      user?.displayName ||
+      user?.name ||
+      "Player",
+    avatar: momoImage,
+  };
+}, [momoImage, user]);
 
   const selectedSong =
     SONGS.find((song) => song.id === selectedSongId) || SONGS[0];
@@ -643,11 +677,13 @@ inviteJoinAttemptedRef.current = true;
             avatar: currentUser.avatar,
             ready: false,
             beatmapReady: false,
+            preparedRoundId: null,
             voteSongId: roomData.songId || SONGS[0].id,
             voteDifficulty: roomData.difficulty || "NORMAL",
             ...emptyStats(),
             accuracy: 100,
             finished: false,
+            finishedRoundId: null,
             joinedAt: serverTimestamp(),
           }
         );
@@ -735,20 +771,67 @@ if (room.difficulty) {
 }
 
     if (
-      room.status === "playing" &&
-      room.startAt &&
-      !startedRef.current
-    ) {
-      setSelectedSongId(room.songId);
-      setSelectedDifficulty(room.difficulty || "NORMAL");
-      setScreen("game");
-    }
+  room.status === "playing" &&
+  room.startAt &&
+  room.roundId &&
+  currentRoomPlayer?.beatmapReady === true &&
+  currentRoomPlayer?.preparedRoundId === room.roundId &&
+  preparedRoundIdRef.current === room.roundId &&
+  preparedBeatmapRef.current &&
+  startedRoundIdRef.current !== room.roundId
+) {
+  setMessage("");
+  setBeatmapLoading(false);
+  setSelectedSongId(room.songId);
+  setSelectedDifficulty(room.difficulty || "NORMAL");
+  setScreen("game");
+}
+
+if (room.status === "lobby" && screen === "results") {
+  stopEngine();
+
+  startedRef.current = false;
+  finishedRef.current = false;
+  pausedRef.current = false;
+
+  startedRoundIdRef.current = null;
+  preparedRoundIdRef.current = null;
+  publishedRoundIdRef.current = null;
+  preparedBeatmapRef.current = null;
+
+  statsRef.current = emptyStats();
+  chartRef.current = [];
+  visibleNotesRef.current = [];
+  nextNoteIndexRef.current = 0;
+  pressedLanesRef.current.clear();
+
+  setGameStats(emptyStats());
+  setResultRows([]);
+  setRemaining(0);
+  setPaused(false);
+  setHasForfeited(false);
+  setShowForfeitConfirm(false);
+  setBeatmapLoading(false);
+  setCountdown(null);
+  setMessage("");
+  setScreen("lobby");
+
+  return;
+}
 
     if (room.status === "results" && screen !== "results") {
       setResultRows([...players].sort((a, b) => b.score - a.score));
       setScreen("results");
     }
-  }, [players, room, roomId, screen]);
+  }, [
+  currentRoomPlayer?.beatmapReady,
+  currentRoomPlayer?.preparedRoundId,
+  players,
+  room,
+  roomId,
+  screen,
+  stopEngine,
+]);
 
 useEffect(() => {
   if (
@@ -757,7 +840,8 @@ useEffect(() => {
     room?.status !== "preparing" ||
     !room?.songId ||
     !currentRoomPlayer ||
-    currentRoomPlayer.beatmapReady
+    !room?.roundId ||
+    currentRoomPlayer.preparedRoundId === room.roundId
   ) {
     return;
   }
@@ -776,9 +860,49 @@ useEffect(() => {
     setMessage("Creating automatic beatmap...");
 
     try {
-      await prewarmBeatmap(song, difficulty);
+      let preparedBeatmap = null;
+let lastError = null;
 
-      if (cancelled) return;
+for (let attempt = 1; attempt <= 3; attempt += 1) {
+  try {
+    console.log(
+      `Preparing beatmap attempt ${attempt}/3`,
+      song.id,
+      difficulty
+    );
+
+    preparedBeatmap = await prewarmBeatmap(
+      song,
+      difficulty
+    );
+
+    break;
+  } catch (error) {
+    lastError = error;
+
+    console.error(
+      `Beatmap attempt ${attempt} failed:`,
+      error
+    );
+
+    if (attempt < 3) {
+      await new Promise((resolve) =>
+        window.setTimeout(resolve, 800)
+      );
+    }
+  }
+}
+
+if (!preparedBeatmap) {
+  throw lastError || new Error(
+    "Beatmap preparation failed after three attempts."
+  );
+}
+
+if (cancelled) return;
+
+preparedBeatmapRef.current = preparedBeatmap;
+preparedRoundIdRef.current = room.roundId;
 
       await updateDoc(
         doc(
@@ -790,21 +914,55 @@ useEffect(() => {
         ),
         {
           beatmapReady: true,
+          preparedRoundId: room.roundId,
         }
       );
 
-      setMessage("Beatmap ready. Waiting for players...");
+      setMessage("");
     } catch (error) {
-      console.error(error);
+  console.error("Online beatmap preparation failed:", {
+    error,
+    playerUid: currentUser.uid,
+    playerName: currentUser.name,
+    roomId,
+    roundId: room?.roundId,
+    songId: room?.songId,
+    difficulty: room?.difficulty,
+  });
 
-      if (!cancelled) {
-        setMessage("Could not prepare the automatic beatmap.");
+  preparedBeatmapRef.current = null;
+  preparedRoundIdRef.current = null;
+
+  if (!cancelled) {
+    setMessage(
+      "Beatmap preparation failed. Please refresh and rejoin the room."
+    );
+  }
+
+  try {
+    await updateDoc(
+      doc(
+        db,
+        "momoBeatRooms",
+        roomId,
+        "players",
+        currentUser.uid
+      ),
+      {
+        beatmapReady: false,
+        preparedRoundId: null,
+        preparationError: true,
       }
-    } finally {
-      if (!cancelled) {
-        setBeatmapLoading(false);
-      }
-    }
+    );
+  } catch (updateError) {
+    console.error(
+      "Could not publish beatmap preparation error:",
+      updateError
+    );
+  }
+} finally {
+  setBeatmapLoading(false);
+}
   }
 
   prepareOnlineBeatmap();
@@ -813,10 +971,11 @@ useEffect(() => {
     cancelled = true;
   };
 }, [
-  currentRoomPlayer,
+  currentRoomPlayer?.preparedRoundId,
   currentUser.uid,
   mode,
   room?.difficulty,
+  room?.roundId,
   room?.songId,
   room?.status,
   roomId,
@@ -830,16 +989,18 @@ useEffect(() => {
       const roomRef = doc(db, "momoBeatRooms", code);
 
       await setDoc(roomRef, {
-        code,
-        mode: roomMode,
-        hostUid: currentUser.uid,
-        status: "lobby",
-        songId: selectedSongId,
-        difficulty: selectedDifficulty,
-        maxPlayers: MAX_PLAYERS,
-        startAt: null,
-        createdAt: serverTimestamp(),
-      });
+      code,
+      mode: roomMode,
+      hostUid: currentUser.uid,
+      status: "lobby",
+      roundId: null,
+      beatmapSeed: null,
+      songId: selectedSongId,
+      difficulty: selectedDifficulty,
+      maxPlayers: MAX_PLAYERS,
+      startAt: null,
+      createdAt: serverTimestamp(),
+    });
 
       await setDoc(
         doc(db, "momoBeatRooms", code, "players", currentUser.uid),
@@ -848,11 +1009,13 @@ useEffect(() => {
           avatar: currentUser.avatar,
           ready: false,
           beatmapReady: false,
+          preparedRoundId: null,
           voteSongId: selectedSongId,
           voteDifficulty: selectedDifficulty,
           ...emptyStats(),
           accuracy: 100,
           finished: false,
+          finishedRoundId: null,
           joinedAt: serverTimestamp(),
         }
       );
@@ -979,6 +1142,7 @@ useEffect(() => {
       if (!roomId || !currentUser.uid) return;
 
       const friendUid = friend.uid || friend.id;
+      
 
       if (!friendUid) {
         setMessage("Could not find this friend's ID.");
@@ -1090,15 +1254,60 @@ useEffect(() => {
 
 
   const toggleReady = useCallback(async () => {
-    if (!roomId || !currentRoomPlayer) return;
+  if (!roomId || !currentRoomPlayer) return;
 
-    await updateDoc(
-      doc(db, "momoBeatRooms", roomId, "players", currentUser.uid),
-      {
-        ready: !currentRoomPlayer.ready,
+  const becomingReady = !currentRoomPlayer.ready;
+
+  if (becomingReady) {
+    try {
+      if (preparedAudioRef.current) {
+        preparedAudioRef.current.pause();
+        preparedAudioRef.current = null;
       }
-    );
-  }, [currentRoomPlayer, currentUser.uid, roomId]);
+
+      const unlockedAudio = new Audio(roomSong.audio);
+
+      unlockedAudio.preload = "auto";
+      unlockedAudio.muted = true;
+      unlockedAudio.volume = 0;
+
+      await unlockedAudio.play();
+
+      unlockedAudio.pause();
+      unlockedAudio.currentTime = 0;
+      unlockedAudio.muted = false;
+      unlockedAudio.volume = 0.88;
+
+      preparedAudioRef.current = unlockedAudio;
+    } catch (error) {
+      console.warn("Audio unlock failed:", error);
+
+      setMessage(
+        "Tap READY again to allow the song to play."
+      );
+
+      return;
+    }
+  }
+
+  await updateDoc(
+    doc(
+      db,
+      "momoBeatRooms",
+      roomId,
+      "players",
+      currentUser.uid
+    ),
+    {
+      ready: becomingReady,
+    }
+  );
+}, [
+  currentRoomPlayer,
+  currentUser.uid,
+  roomId,
+  roomSong.audio,
+]);
 
   const voteSong = useCallback(
   async (songId) => {
@@ -1127,27 +1336,65 @@ useEffect(() => {
 
   const voteDifficulty = useCallback(
   async (difficulty) => {
+    if (
+      !roomId ||
+      room?.status !== "lobby" ||
+      !isHost
+    ) {
+      return;
+    }
+
     setSelectedDifficulty(difficulty);
+    setMessage("");
 
-    if (!roomId) return;
+    try {
+      const roomRef = doc(
+        db,
+        "momoBeatRooms",
+        roomId
+      );
 
-    await updateDoc(
-      doc(db, "momoBeatRooms", roomId, "players", currentUser.uid),
-      {
-        voteDifficulty: difficulty,
-      }
-    );
+      await updateDoc(roomRef, {
+        difficulty,
+        startAt: null,
+      });
 
-    if (isHost) {
-      await updateDoc(
-        doc(db, "momoBeatRooms", roomId),
-        {
-          difficulty,
-        }
+      await Promise.all(
+        players.map((player) =>
+          updateDoc(
+            doc(
+              db,
+              "momoBeatRooms",
+              roomId,
+              "players",
+              player.uid
+            ),
+            {
+              voteDifficulty: difficulty,
+              ready: false,
+              beatmapReady: false,
+              preparedRoundId: null,
+            }
+          )
+        )
+      );
+    } catch (error) {
+      console.error(
+        "Difficulty update failed:",
+        error
+      );
+
+      setMessage(
+        "Could not update the difficulty."
       );
     }
   },
-  [currentUser.uid, isHost, roomId]
+  [
+    isHost,
+    players,
+    room?.status,
+    roomId,
+  ]
 );
 
   const winningVoteDifficulty = useCallback(() => {
@@ -1183,87 +1430,110 @@ useEffect(() => {
   }, [players, selectedSongId]);
 
   const startOnlineMatch = useCallback(async () => {
-  if (!roomId || !isHost) return;
+    if (!roomId || !isHost) return;
 
-  if (players.length < 2) {
-    setMessage("At least two players are required.");
-    return;
-  }
+    if (players.length < 2) {
+      setMessage("At least two players are required.");
+      return;
+    }
 
-  if (!players.every((player) => player.ready)) {
-    setMessage("Everyone must be ready.");
-    return;
-  }
+    if (!players.every((player) => player.ready)) {
+      setMessage("Everyone must be ready.");
+      return;
+    }
 
-  setMessage("Preparing beatmaps...");
+    const roundId = makeRoundId();
+    const songId = room?.songId || selectedSongId;
+    const difficulty = room?.difficulty || selectedDifficulty;
+    const batch = writeBatch(db);
 
-  const songId = winningVoteSong();
-  const difficulty = winningVoteDifficulty();
-
-  await Promise.all(
-    players.map((player) =>
-      updateDoc(
-        doc(
-          db,
-          "momoBeatRooms",
-          roomId,
-          "players",
-          player.uid
-        ),
+    players.forEach((player) => {
+      batch.update(
+        doc(db, "momoBeatRooms", roomId, "players", player.uid),
         {
           ...emptyStats(),
           accuracy: 100,
           finished: false,
+          finishedRoundId: null,
           ready: false,
           beatmapReady: false,
+          preparedRoundId: null,
         }
-      )
-    )
-  );
+      );
+    });
 
-  await updateDoc(
-    doc(db, "momoBeatRooms", roomId),
-    {
+    batch.update(doc(db, "momoBeatRooms", roomId), {
       status: "preparing",
+      roundId,
+      beatmapSeed: `${songId}:${difficulty}:${roundId}`,
       songId,
       difficulty,
       startAt: null,
+    });
+
+    publishedRoundIdRef.current = null;
+    preparedRoundIdRef.current = null;
+    preparedBeatmapRef.current = null;
+    setMessage("Preparing beatmaps...");
+
+    try {
+      await batch.commit();
+    } catch (error) {
+      console.error(error);
+      setMessage("Could not prepare the match.");
     }
-  );
-}, [
-  isHost,
-  players,
-  roomId,
-  winningVoteDifficulty,
-  winningVoteSong,
-]);
+  }, [
+    isHost,
+    players,
+    room?.difficulty,
+    room?.songId,
+    roomId,
+    selectedDifficulty,
+    selectedSongId,
+  ]);
 
 useEffect(() => {
   if (
     !isHost ||
     !roomId ||
     room?.status !== "preparing" ||
-    players.length === 0
+    !room?.roundId ||
+    players.length === 0 ||
+    publishedRoundIdRef.current === room.roundId
   ) {
     return;
   }
 
-  const everyoneBeatmapReady = players.every(
-    (player) => player.beatmapReady
+  const readyPlayers = players.filter(
+  (player) =>
+    player.beatmapReady === true &&
+    player.preparedRoundId === room.roundId
+);
+
+if (readyPlayers.length < players.length) {
+  setMessage(
+    `Preparing beatmaps... ${readyPlayers.length}/${players.length} ready`
   );
 
-  if (!everyoneBeatmapReady) return;
+  return;
+}
 
-  updateDoc(doc(db, "momoBeatRooms", roomId), {
-    status: "playing",
-    startAt: Date.now() + 4200,
-  }).catch((error) => {
-    console.error(error);
-    setMessage("Could not start the match.");
-  });
+  publishedRoundIdRef.current = room.roundId;
+  setMessage("Everyone is ready! Starting match...");
+
+ updateDoc(doc(db, "momoBeatRooms", roomId), {
+  status: "playing",
+  startAt: Date.now() + 8000,
+}).catch((error) => {
+  publishedRoundIdRef.current = null;
+  console.error("Could not publish online match:", error);
+  setMessage("Could not start the match.");
+});
+
 }, [
   isHost,
   players,
+  room?.roundId,
   room?.status,
   roomId,
 ]);
@@ -1272,25 +1542,35 @@ useEffect(() => {
     if (!roomId || mode === "solo") return;
 
     const now = Date.now();
-    if (now - lastLiveSyncRef.current < 350) return;
+    if (
+      liveSyncInFlightRef.current ||
+      now - lastLiveSyncRef.current < 500
+    ) return;
+
+    liveSyncInFlightRef.current = true;
     lastLiveSyncRef.current = now;
 
     const stats = statsRef.current;
 
-    await updateDoc(
-      doc(db, "momoBeatRooms", roomId, "players", currentUser.uid),
-      {
-        score: stats.score,
-        combo: stats.combo,
-        maxCombo: stats.maxCombo,
-        perfect: stats.perfect,
-        great: stats.great,
-        good: stats.good,
-        miss: stats.miss,
-        accuracy: accuracyFrom(stats),
-      }
-    );
-  }, [currentUser.uid, mode, roomId]);
+    try {
+      await updateDoc(
+        doc(db, "momoBeatRooms", roomId, "players", currentUser.uid),
+        {
+          score: stats.score,
+          combo: stats.combo,
+          maxCombo: stats.maxCombo,
+          perfect: stats.perfect,
+          great: stats.great,
+          good: stats.good,
+          miss: stats.miss,
+          accuracy: accuracyFrom(stats),
+          activeRoundId: room?.roundId || null,
+        }
+      );
+    } finally {
+      liveSyncInFlightRef.current = false;
+    }
+  }, [currentUser.uid, mode, room?.roundId, roomId]);
 
   const finishSolo = useCallback(() => {
     const stats = statsRef.current;
@@ -1303,6 +1583,7 @@ useEffect(() => {
         ...stats,
         accuracy: accuracyFrom(stats),
         finished: true,
+        finishedRoundId: room?.roundId || null,
       },
     ]);
 
@@ -1310,25 +1591,26 @@ useEffect(() => {
   }, [currentUser]);
 
   const finishOnline = useCallback(async () => {
-    if (!roomId) return;
+  if (!roomId) return;
 
-    const stats = statsRef.current;
+  const stats = statsRef.current;
 
-    await updateDoc(
-      doc(db, "momoBeatRooms", roomId, "players", currentUser.uid),
-      {
-        score: stats.score,
-        combo: stats.combo,
-        maxCombo: stats.maxCombo,
-        perfect: stats.perfect,
-        great: stats.great,
-        good: stats.good,
-        miss: stats.miss,
-        accuracy: accuracyFrom(stats),
-        finished: true,
-      }
-    );
-  }, [currentUser.uid, roomId]);
+  await updateDoc(
+    doc(db, "momoBeatRooms", roomId, "players", currentUser.uid),
+    {
+      score: stats.score,
+      combo: stats.combo,
+      maxCombo: stats.maxCombo,
+      perfect: stats.perfect,
+      great: stats.great,
+      good: stats.good,
+      miss: stats.miss,
+      accuracy: accuracyFrom(stats),
+      finished: true,
+      finishedRoundId: room?.roundId || null,
+    }
+  );
+  }, [currentUser.uid, room?.roundId, roomId]);
 
   const forfeitOnlineMatch = useCallback(async () => {
   if (!roomId || mode === "solo" || hasForfeited) return;
@@ -1352,6 +1634,7 @@ useEffect(() => {
     miss: 0,
     accuracy: 0,
     finished: true,
+    finishedRoundId: room?.roundId || null,
   };
 
   statsRef.current = {
@@ -1386,6 +1669,7 @@ useEffect(() => {
   currentUser.uid,
   hasForfeited,
   mode,
+  room?.roundId,
   roomId,
 ]);
 
@@ -1413,7 +1697,12 @@ useEffect(() => {
       return;
     }
 
-    if (players.every((player) => player.finished)) {
+    if (
+      room?.roundId &&
+      players.every(
+        (player) => player.finishedRoundId === room.roundId
+      )
+    ) {
       const sorted = [...players].sort((a, b) => b.score - a.score);
       setResultRows(sorted);
 
@@ -1424,7 +1713,7 @@ useEffect(() => {
         }).catch(console.warn);
       }
     }
-  }, [isHost, mode, players, room?.status, roomId]);
+  }, [isHost, mode, players, room?.roundId, room?.status, roomId]);
 
   const drawCanvas = useCallback(() => {
     const canvas = canvasRef.current;
@@ -1451,7 +1740,7 @@ useEffect(() => {
     context.clearRect(0, 0, rectangle.width, rectangle.height);
 
     const laneWidth = rectangle.width / 4;
-    const hitLineY = rectangle.height - 80;
+    const hitLineY = rectangle.height - 105;
     const currentTime = audio.currentTime * 1000;
 
     const laneGradient = context.createLinearGradient(
@@ -1768,33 +2057,45 @@ if (
     setGameStats(emptyStats());
     setRemaining(song.duration);
     setPaused(false);
-    setMessage("");
+    setMessage("Beatmap ready. Waiting for players...");
 
 const engineDifficulty =
   mode === "solo"
     ? selectedDifficulty
     : room?.difficulty || selectedDifficulty;
 
-let generatedBeatmap;
+const generatedBeatmap =
+  mode === "solo"
+    ? await prewarmBeatmap(song, engineDifficulty)
+    : preparedBeatmapRef.current;
 
-try {
-  generatedBeatmap = await prewarmBeatmap(
-    song,
-    engineDifficulty
-  );
-} catch (error) {
-      console.error(error);
-      startedRef.current = false;
-      setMessage("The automatic beatmap could not be created.");
-      return;
-    }
+if (
+  !generatedBeatmap ||
+  (mode !== "solo" && preparedRoundIdRef.current !== room?.roundId)
+) {
+  startedRef.current = false;
+  setMessage("The prepared beatmap could not be found.");
+  return;
+}
 
-    chartRef.current = generatedBeatmap.notes;
+chartRef.current = generatedBeatmap.notes;
     visibleNotesRef.current = [];
     nextNoteIndexRef.current = 0;
     pressedLanesRef.current.clear();
 
-    const audio = new Audio(song.audio);
+    const preparedAudio = preparedAudioRef.current;
+
+    const preparedAudioMatches =
+    preparedAudio &&
+    preparedAudio.src ===
+        new URL(song.audio, window.location.href).href;
+
+    const audio = preparedAudioMatches
+    ? preparedAudio
+    : new Audio(song.audio);
+
+    preparedAudioRef.current = null;
+
     audio.preload = "auto";
     audio.volume = 0.88;
     audioRef.current = audio;
@@ -1805,33 +2106,65 @@ try {
 
     setMessage("");
 
-    const wait = Math.max(
-      0,
-      scheduledStart - Date.now()
-    );
+    const now = Date.now();
 
-    [3, 2, 1].forEach((number, index) => {
-      countdownTimersRef.current.push(
-        window.setTimeout(
-          () => setCountdown(number),
-          wait + index * 800
-        )
+const timeUntilStart =
+  scheduledStart - now;
+
+
+
+const wait = Math.max(0, timeUntilStart);
+
+setCountdown(wait > 2000 ? 3 : wait > 1000 ? 2 : wait > 0 ? 1 : null);
+
+if (wait > 2000) {
+  countdownTimersRef.current.push(
+    window.setTimeout(() => setCountdown(2), wait - 2000)
+  );
+}
+
+if (wait > 1000) {
+  countdownTimersRef.current.push(
+    window.setTimeout(() => setCountdown(1), wait - 1000)
+  );
+}
+
+countdownTimersRef.current.push(
+  window.setTimeout(async () => {
+    setCountdown(null);
+
+  try {
+  const actualLateByMs = Math.max(
+    0,
+    Date.now() - scheduledStart
+  );
+
+  if (actualLateByMs > 0) {
+      const lateBySeconds = actualLateByMs / 1000;
+
+      const maxSeekTime = Math.max(
+        0,
+        (audio.duration || song.duration) - 0.25
       );
-    });
 
-    countdownTimersRef.current.push(
-      window.setTimeout(async () => {
+      audio.currentTime = Math.min(
+        lateBySeconds,
+        maxSeekTime
+      );
+    }
+
+    await audio.play();
+        } catch (error) {
+        console.error("Audio playback blocked:", error);
+
+        startedRef.current = true;
         setCountdown(null);
 
-        try {
-          await audio.play();
-        } catch (error) {
-          console.error(error);
-          startedRef.current = false;
-          setMessage(
-            "The song could not start. Check the MP3 path."
-          );
-          return;
+        setMessage(
+            "Audio was blocked. Leave the room, rejoin, and tap READY once."
+        );
+
+        return;
         }
 
         function frame() {
@@ -1883,10 +2216,13 @@ try {
                   HIT_WINDOWS.miss + 90
             );
 
-          const duration =
+          const duration = Math.min(
+            180,
+            song.duration,
             audioRef.current.duration ||
-            generatedBeatmap.duration ||
-            song.duration;
+              generatedBeatmap.duration ||
+              song.duration
+          );
 
           setRemaining(
             Math.max(
@@ -1919,7 +2255,7 @@ try {
         frameLoopRef.current = frame;
         animationFrameRef.current =
           window.requestAnimationFrame(frame);
-      }, wait + 2400)
+      }, wait)
     );
   },
   [
@@ -1935,18 +2271,25 @@ try {
 );
 
   useEffect(() => {
-    if (screen !== "game" || startedRef.current) return;
+    if (screen !== "game") return;
 
     if (mode === "solo") {
       startEngine(selectedSong, Date.now() + 150);
       return;
     }
 
-    if (room?.startAt) {
+    if (
+      room?.startAt &&
+      room?.roundId &&
+      preparedRoundIdRef.current === room.roundId &&
+      startedRoundIdRef.current !== room.roundId
+    ) {
+      startedRoundIdRef.current = room.roundId;
       startEngine(roomSong, room.startAt);
     }
   }, [
     mode,
+    room?.roundId,
     room?.startAt,
     roomSong,
     screen,
@@ -2019,9 +2362,10 @@ const chooseRandomSong = useCallback(() => {
   if (beatmapLoading) return;
 
   setBeatmapLoading(true);
-  setMessage("Analyzing song and creating beatmap...");
+setMessage("Creating automatic beatmap...");
+preparedBeatmapRef.current = null;
 
-  try {
+try {
     await prewarmBeatmap(
       selectedSong,
       selectedDifficulty
@@ -2069,23 +2413,82 @@ const chooseRandomSong = useCallback(() => {
     }
   }, [mode]);
 
-  const returnFromResults = useCallback(async () => {
+ const returnFromResults = useCallback(async () => {
+  if (mode === "solo") {
     stopEngine();
 
-    if (mode === "solo") {
-      setScreen("soloHome");
-      return;
-    }
+    startedRef.current = false;
+    finishedRef.current = false;
+    pausedRef.current = false;
 
-    if (roomId && isHost) {
-      await updateDoc(doc(db, "momoBeatRooms", roomId), {
-        status: "lobby",
-        startAt: null,
-      });
-    }
+    statsRef.current = emptyStats();
+    chartRef.current = [];
+    visibleNotesRef.current = [];
+    nextNoteIndexRef.current = 0;
+    pressedLanesRef.current.clear();
 
-    setScreen("lobby");
-  }, [isHost, mode, roomId, stopEngine]);
+    setGameStats(emptyStats());
+    setResultRows([]);
+    setRemaining(0);
+    setPaused(false);
+    setHasForfeited(false);
+    setShowForfeitConfirm(false);
+    setBeatmapLoading(false);
+    setCountdown(null);
+    setMessage("");
+    setScreen("soloHome");
+
+    return;
+  }
+
+  if (!isHost) {
+    setMessage("Waiting for the host to return everyone to the lobby...");
+    return;
+  }
+
+  if (!roomId) return;
+
+  setMessage("Returning everyone to the lobby...");
+
+  const batch = writeBatch(db);
+
+  players.forEach((player) => {
+    batch.update(
+      doc(db, "momoBeatRooms", roomId, "players", player.uid),
+      {
+        ...emptyStats(),
+        accuracy: 100,
+        finished: false,
+        finishedRoundId: null,
+        ready: false,
+        beatmapReady: false,
+        preparedRoundId: null,
+        preparationError: false,
+        activeRoundId: null,
+      }
+    );
+  });
+
+  batch.update(doc(db, "momoBeatRooms", roomId), {
+    status: "lobby",
+    roundId: null,
+    beatmapSeed: null,
+    startAt: null,
+  });
+
+  try {
+    await batch.commit();
+  } catch (error) {
+    console.error("Could not return to lobby:", error);
+    setMessage("Could not return everyone to the lobby.");
+  }
+}, [
+  isHost,
+  mode,
+  players,
+  roomId,
+  stopEngine,
+]);
 
   const liveRanking = useMemo(() => {
     if (mode === "solo") {
@@ -2574,22 +2977,25 @@ const lobbySlots = Array.from(
   }
 
   function moveLobbyDifficulty(direction) {
-    const currentDifficulty =
-      currentRoomPlayer?.voteDifficulty ||
-      selectedDifficulty ||
-      "NORMAL";
+  if (!isHost) return;
 
-    const currentIndex =
-      difficultyOptions.indexOf(currentDifficulty);
+  const currentDifficulty =
+    room?.difficulty || "NORMAL";
 
-    const nextIndex =
-      (currentIndex +
-        direction +
-        difficultyOptions.length) %
-      difficultyOptions.length;
+  const currentIndex =
+    difficultyOptions.indexOf(currentDifficulty);
 
-    voteDifficulty(difficultyOptions[nextIndex]);
-  }
+  const safeIndex =
+    currentIndex >= 0 ? currentIndex : 1;
+
+  const nextIndex =
+    (safeIndex +
+      direction +
+      difficultyOptions.length) %
+    difficultyOptions.length;
+
+  voteDifficulty(difficultyOptions[nextIndex]);
+}
 
   return (
     <section
@@ -2777,9 +3183,7 @@ const lobbySlots = Array.from(
 
         <div className="mba-o2-song-tags">
             <span className="tag-difficulty">
-            {currentRoomPlayer?.voteDifficulty ||
-                selectedDifficulty ||
-                "NORMAL"}
+            {room?.difficulty || "NORMAL"}
             </span>
 
             <span className="tag-bpm">
@@ -2809,8 +3213,12 @@ const lobbySlots = Array.from(
             type="button"
             className="mba-o2-change-song"
             onClick={() => {
-                setSongSelectionSource("online");
-                setScreen("songs");
+            setSelectedDifficulty(
+                room?.difficulty || "NORMAL"
+            );
+
+            setSongSelectionSource("online");
+            setScreen("songs");
             }}
             >
         <span>♫</span>
@@ -2830,10 +3238,9 @@ const lobbySlots = Array.from(
 
         <div className="mba-o2-setting-card">
         <small>DIFFICULTY</small>
+
         <strong className="difficulty">
-            {currentRoomPlayer?.voteDifficulty ||
-            selectedDifficulty ||
-            "NORMAL"}
+            {room?.difficulty || "NORMAL"}
         </strong>
         </div>
 
@@ -2894,15 +3301,21 @@ const lobbySlots = Array.from(
 
             <div className="mba-o2-chat-input">
             <input
-                type="text"
-                placeholder="Type a message..."
-                value={chatText}
-                onChange={(e) => setChatText(e.target.value)}
-                onKeyDown={(e) => {
+              type="text"
+              placeholder="Type a message..."
+              value={chatText}
+              onChange={(e) => setChatText(e.target.value)}
+              onKeyDown={(e) => {
+                e.stopPropagation();
+
                 if (e.key === "Enter") {
-                    sendChatMessage();
+                  e.preventDefault();
+                  sendChatMessage();
                 }
-                }}
+              }}
+              onKeyUp={(e) => {
+                e.stopPropagation();
+              }}
             />
 
             <button
@@ -3025,9 +3438,15 @@ const lobbySlots = Array.from(
                         src={
                           friend.avatar ||
                           friend.momoImage ||
-                          "/momo-beat/ui/default-avatar.png"
+                          `/characters/${String(
+                            friend.momoType || "momo"
+                          ).toLowerCase()}/happy.png`
                         }
-                        alt=""
+                        alt={friend.momoType || "Momo"}
+                        onError={(event) => {
+                          event.currentTarget.src =
+                            "/characters/momo/happy.png";
+                        }}
                       />
 
                       <div>
