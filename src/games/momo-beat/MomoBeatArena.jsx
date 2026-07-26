@@ -347,6 +347,244 @@ const SONGS = [
     beatmapFile: "/assets/beatmaps/bride-in-dream.osu",
     accent: "#cf8cff",
   },
+  {
+  id: "chiisana-koi-no-uta",
+  title: "Chiisana Koi No Uta",
+  artist: "MONGOL800",
+  difficulty: "NORMAL",
+  duration: 180,
+  speed: 6.2,
+  bpm: 116,
+  audioOffset: 0,
+  audio: "/assets/songs/song19.mp3",
+  preview: "/assets/songs/song19.mp3",
+  previewStart: 30,
+  cover: "/assets/covers/cover19.png",
+  background: "/assets/background.jpeg",
+  patternOffset: 19,
+  accent: "#ff9f80",
+},
+{
+  id: "gurenge",
+  title: "Gurenge",
+  artist: "LiSA",
+  difficulty: "NORMAL",
+  duration: 129,
+  speed: 7.0,
+  bpm: 135,
+  audioOffset: 0,
+  audio: "/assets/songs/song20.mp3",
+  preview: "/assets/songs/song20.mp3",
+  previewStart: 20,
+  cover: "/assets/covers/cover19.png",
+  background: "/assets/background.jpeg",
+  patternOffset: 20,
+  accent: "#ff647c",
+},
+{
+  id: "kaikai-kitan",
+  title: "Kaikai Kitan",
+  artist: "Eve",
+  difficulty: "NORMAL",
+  duration: 140,
+  speed: 7.2,
+  bpm: 185,
+  audioOffset: 0,
+  audio: "/assets/songs/song21.mp3",
+  preview: "/assets/songs/song21.mp3",
+  previewStart: 20,
+  cover: "/assets/covers/cover19.png",
+  background: "/assets/background.jpeg",
+  patternOffset: 21,
+  accent: "#956dff",
+},
+{
+  id: "love-yourself",
+  title: "Love Yourself",
+  artist: "Justin Bieber",
+  difficulty: "NORMAL",
+  duration: 180,
+  speed: 4.8,
+  bpm: 100,
+  audioOffset: 0,
+  audio: "/assets/songs/song22.mp3",
+  preview: "/assets/songs/song22.mp3",
+  previewStart: 30,
+  cover: "/assets/covers/cover19.png",
+  background: "/assets/background.jpeg",
+  patternOffset: 22,
+  accent: "#76c9ff",
+},
+{
+  id: "die-with-a-smile",
+  title: "Die With A Smile",
+  artist: "Bruno Mars & Lady Gaga",
+  difficulty: "NORMAL",
+  duration: 180,
+  speed: 5.0,
+  bpm: 158,
+  audioOffset: 0,
+  audio: "/assets/songs/song23.mp3",
+  preview: "/assets/songs/song23.mp3",
+  previewStart: 30,
+  cover: "/assets/covers/cover19.png",
+  background: "/assets/background.jpeg",
+  patternOffset: 23,
+  accent: "#e69aff",
+},
+{
+  id: "blue-bird",
+  title: "Blue Bird",
+  artist: "Ikimonogakari",
+  difficulty: "NORMAL",
+  duration: 140,
+  speed: 7.0,
+  bpm: 152,
+  audioOffset: 0,
+  audio: "/assets/songs/song24.mp3",
+  preview: "/assets/songs/song24.mp3",
+  previewStart: 20,
+  cover: "/assets/covers/cover19.png",
+  background: "/assets/background.jpeg",
+  patternOffset: 24,
+  accent: "#62d8ff",
+},
+{
+  id: "like-ooh-ahh",
+  title: "Like OOH-AHH",
+  artist: "TWICE",
+  difficulty: "NORMAL",
+  duration: 180,
+  speed: 6.3,
+  bpm: 142,
+  audioOffset: 0,
+  audio: "/assets/songs/song25.mp3",
+  preview: "/assets/songs/song25.mp3",
+  previewStart: 30,
+  cover: "/assets/covers/cover19.png",
+  background: "/assets/background.jpeg",
+  patternOffset: 25,
+  accent: "#ff8fc8",
+},
+{
+  id: "cheer-up",
+  title: "Cheer Up",
+  artist: "TWICE",
+  difficulty: "NORMAL",
+  duration: 180,
+  speed: 6.2,
+  bpm: 173,
+  audioOffset: 0,
+  audio: "/assets/songs/song26.mp3",
+  preview: "/assets/songs/song26.mp3",
+  previewStart: 30,
+  cover: "/assets/covers/cover19.png",
+  background: "/assets/background.jpeg",
+  patternOffset: 26,
+  accent: "#ffd369",
+},
+{
+  id: "beautiful-now",
+  title: "Beautiful Now",
+  artist: "Zedd",
+  difficulty: "NORMAL",
+  duration: 180,
+  speed: 7.0,
+  bpm: 128,
+  audioOffset: 0,
+  audio: "/assets/songs/song27.mp3",
+  preview: "/assets/songs/song27.mp3",
+  previewStart: 30,
+  cover: "/assets/covers/cover19.png",
+  background: "/assets/background.jpeg",
+  patternOffset: 27,
+  accent: "#6ee7ff",
+},
+{
+  id: "stay-the-night",
+  title: "Stay the Night",
+  artist: "Zedd",
+  difficulty: "NORMAL",
+  duration: 180,
+  speed: 6.8,
+  bpm: 128,
+  audioOffset: 0,
+  audio: "/assets/songs/song28.mp3",
+  preview: "/assets/songs/song28.mp3",
+  previewStart: 30,
+  cover: "/assets/covers/cover19.png",
+  background: "/assets/background.jpeg",
+  patternOffset: 28,
+  accent: "#738cff",
+},
+{
+  id: "senbonzakura",
+  title: "Senbonzakura",
+  artist: "Yuko Suzuhana",
+  difficulty: "NORMAL",
+  duration: 180,
+  speed: 7.5,
+  bpm: 154,
+  audioOffset: 0,
+  audio: "/assets/songs/song29.mp3",
+  preview: "/assets/songs/song29.mp3",
+  previewStart: 30,
+  cover: "/assets/covers/cover19.png",
+  background: "/assets/background.jpeg",
+  patternOffset: 29,
+  accent: "#ff648f",
+},
+{
+  id: "golden-huntrix",
+  title: "Golden",
+  artist: "HUNTR/X",
+  difficulty: "NORMAL",
+  duration: 192,
+  speed: 7.0,
+  bpm: 123,
+  audioOffset: 0,
+  audio: "/assets/songs/song30.mp3",
+  preview: "/assets/songs/song30.mp3",
+  previewStart: 30,
+  cover: "/assets/covers/cover19.png",
+  background: "/assets/background.jpeg",
+  patternOffset: 30,
+  accent: "#ffd85e",
+},
+{
+  id: "soda-pop",
+  title: "Soda Pop",
+  artist: "Saja Boys",
+  difficulty: "NORMAL",
+  duration: 150,
+  speed: 6.5,
+  bpm: 126,
+  audioOffset: 0,
+  audio: "/assets/songs/song31.mp3",
+  preview: "/assets/songs/song31.mp3",
+  previewStart: 25,
+  cover: "/assets/covers/cover19.png",
+  background: "/assets/background.jpeg",
+  patternOffset: 31,
+  accent: "#75e5d0",
+},
+{
+  id: "what-is-love",
+  title: "What Is Love?",
+  artist: "TWICE",
+  difficulty: "NORMAL",
+  duration: 180,
+  speed: 6.2,
+  bpm: 170,
+  audioOffset: 0,
+  audio: "/assets/songs/song32.mp3",
+  preview: "/assets/songs/song32.mp3",
+  previewStart: 30,
+  cover: "/assets/covers/cover19.png",
+  background: "/assets/background.jpeg",
+  patternOffset: 32,
+  accent: "#ff98c9",
+},
 ];
 
 const LANE_META = [
@@ -469,7 +707,7 @@ export default function MomoBeatArena({
   const [resultRows, setResultRows] = useState([]);
 
   const [beatmapLoading, setBeatmapLoading] = useState(false);
-
+const [soloReadyToStart, setSoloReadyToStart] = useState(false);
   const canvasRef = useRef(null);
   const audioRef = useRef(null);
   const preparedAudioRef = useRef(null);
@@ -2066,7 +2304,7 @@ const engineDifficulty =
 
 const generatedBeatmap =
   mode === "solo"
-    ? await prewarmBeatmap(song, engineDifficulty)
+    ? preparedBeatmapRef.current
     : preparedBeatmapRef.current;
 
 if (
@@ -2161,7 +2399,9 @@ countdownTimersRef.current.push(
         setCountdown(null);
 
         setMessage(
-            "Audio was blocked. Leave the room, rejoin, and tap READY once."
+          mode === "solo"
+            ? "Audio was blocked. Tap Play again to start the song."
+            : "Audio was blocked. Leave the room, rejoin, and tap READY once."
         );
 
         return;
@@ -2362,20 +2602,23 @@ const chooseRandomSong = useCallback(() => {
   if (beatmapLoading) return;
 
   setBeatmapLoading(true);
-setMessage("Creating automatic beatmap...");
-preparedBeatmapRef.current = null;
+  setSoloReadyToStart(false);
+  setMessage("Creating automatic beatmap...");
+  preparedBeatmapRef.current = null;
 
-try {
-    await prewarmBeatmap(
+  try {
+    const preparedBeatmap = await prewarmBeatmap(
       selectedSong,
       selectedDifficulty
     );
 
-    startedRef.current = false;
-    setMessage("");
-    setScreen("game");
+    preparedBeatmapRef.current = preparedBeatmap;
+
+    setMessage("Beatmap ready! Tap START SONG.");
+    setSoloReadyToStart(true);
   } catch (error) {
-    console.error(error);
+    console.error("Solo beatmap preparation failed:", error);
+    preparedBeatmapRef.current = null;
     setMessage("Could not prepare the automatic beatmap.");
   } finally {
     setBeatmapLoading(false);
@@ -2385,6 +2628,38 @@ try {
   selectedDifficulty,
   selectedSong,
 ]);
+
+const startPreparedSoloSong = useCallback(async () => {
+  if (!preparedBeatmapRef.current) {
+    setMessage("The beatmap is not ready yet.");
+    return;
+  }
+
+  try {
+    if (preparedAudioRef.current) {
+      preparedAudioRef.current.pause();
+      preparedAudioRef.current = null;
+    }
+
+    const audio = new Audio(selectedSong.audio);
+
+    audio.preload = "auto";
+    audio.volume = 0.88;
+    audio.currentTime = 0;
+
+    await audio.play();
+
+    preparedAudioRef.current = audio;
+
+    startedRef.current = false;
+    setSoloReadyToStart(false);
+    setMessage("");
+    setScreen("game");
+  } catch (error) {
+    console.error("Solo audio start failed:", error);
+    setMessage("Audio was blocked. Tap START SONG again.");
+  }
+}, [selectedSong]);
 
   const pauseSolo = useCallback(() => {
     if (mode !== "solo" || !audioRef.current) return;
