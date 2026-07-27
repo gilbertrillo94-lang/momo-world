@@ -376,7 +376,7 @@ const SONGS = [
   audio: "/assets/songs/song20.mp3",
   preview: "/assets/songs/song20.mp3",
   previewStart: 20,
-  cover: "/assets/covers/cover19.png",
+  cover: "/assets/covers/cover20.png",
   background: "/assets/background.jpeg",
   patternOffset: 20,
   accent: "#ff647c",
@@ -393,7 +393,7 @@ const SONGS = [
   audio: "/assets/songs/song21.mp3",
   preview: "/assets/songs/song21.mp3",
   previewStart: 20,
-  cover: "/assets/covers/cover19.png",
+  cover: "/assets/covers/cover21.png",
   background: "/assets/background.jpeg",
   patternOffset: 21,
   accent: "#956dff",
@@ -410,7 +410,7 @@ const SONGS = [
   audio: "/assets/songs/song22.mp3",
   preview: "/assets/songs/song22.mp3",
   previewStart: 30,
-  cover: "/assets/covers/cover19.png",
+  cover: "/assets/covers/cover22.png",
   background: "/assets/background.jpeg",
   patternOffset: 22,
   accent: "#76c9ff",
@@ -427,7 +427,7 @@ const SONGS = [
   audio: "/assets/songs/song23.mp3",
   preview: "/assets/songs/song23.mp3",
   previewStart: 30,
-  cover: "/assets/covers/cover19.png",
+  cover: "/assets/covers/cover23.png",
   background: "/assets/background.jpeg",
   patternOffset: 23,
   accent: "#e69aff",
@@ -444,7 +444,7 @@ const SONGS = [
   audio: "/assets/songs/song24.mp3",
   preview: "/assets/songs/song24.mp3",
   previewStart: 20,
-  cover: "/assets/covers/cover19.png",
+  cover: "/assets/covers/cover24.png",
   background: "/assets/background.jpeg",
   patternOffset: 24,
   accent: "#62d8ff",
@@ -461,7 +461,7 @@ const SONGS = [
   audio: "/assets/songs/song25.mp3",
   preview: "/assets/songs/song25.mp3",
   previewStart: 30,
-  cover: "/assets/covers/cover19.png",
+  cover: "/assets/covers/cover25.png",
   background: "/assets/background.jpeg",
   patternOffset: 25,
   accent: "#ff8fc8",
@@ -478,7 +478,7 @@ const SONGS = [
   audio: "/assets/songs/song26.mp3",
   preview: "/assets/songs/song26.mp3",
   previewStart: 30,
-  cover: "/assets/covers/cover19.png",
+  cover: "/assets/covers/cover26.png",
   background: "/assets/background.jpeg",
   patternOffset: 26,
   accent: "#ffd369",
@@ -495,7 +495,7 @@ const SONGS = [
   audio: "/assets/songs/song27.mp3",
   preview: "/assets/songs/song27.mp3",
   previewStart: 30,
-  cover: "/assets/covers/cover19.png",
+  cover: "/assets/covers/cover27.png",
   background: "/assets/background.jpeg",
   patternOffset: 27,
   accent: "#6ee7ff",
@@ -512,7 +512,7 @@ const SONGS = [
   audio: "/assets/songs/song28.mp3",
   preview: "/assets/songs/song28.mp3",
   previewStart: 30,
-  cover: "/assets/covers/cover19.png",
+  cover: "/assets/covers/cover28.png",
   background: "/assets/background.jpeg",
   patternOffset: 28,
   accent: "#738cff",
@@ -529,7 +529,7 @@ const SONGS = [
   audio: "/assets/songs/song29.mp3",
   preview: "/assets/songs/song29.mp3",
   previewStart: 30,
-  cover: "/assets/covers/cover19.png",
+  cover: "/assets/covers/cover29.png",
   background: "/assets/background.jpeg",
   patternOffset: 29,
   accent: "#ff648f",
@@ -546,7 +546,7 @@ const SONGS = [
   audio: "/assets/songs/song30.mp3",
   preview: "/assets/songs/song30.mp3",
   previewStart: 30,
-  cover: "/assets/covers/cover19.png",
+  cover: "/assets/covers/cover30.png",
   background: "/assets/background.jpeg",
   patternOffset: 30,
   accent: "#ffd85e",
@@ -563,7 +563,7 @@ const SONGS = [
   audio: "/assets/songs/song31.mp3",
   preview: "/assets/songs/song31.mp3",
   previewStart: 25,
-  cover: "/assets/covers/cover19.png",
+  cover: "/assets/covers/cover31.png",
   background: "/assets/background.jpeg",
   patternOffset: 31,
   accent: "#75e5d0",
@@ -580,7 +580,7 @@ const SONGS = [
   audio: "/assets/songs/song32.mp3",
   preview: "/assets/songs/song32.mp3",
   previewStart: 30,
-  cover: "/assets/covers/cover19.png",
+  cover: "/assets/covers/cover32.png",
   background: "/assets/background.jpeg",
   patternOffset: 32,
   accent: "#ff98c9",
@@ -2304,7 +2304,8 @@ const engineDifficulty =
 
 const generatedBeatmap =
   mode === "solo"
-    ? preparedBeatmapRef.current
+    ? preparedBeatmapRef.current ||
+      (await prewarmBeatmap(song, engineDifficulty))
     : preparedBeatmapRef.current;
 
 if (
@@ -2514,9 +2515,11 @@ countdownTimersRef.current.push(
     if (screen !== "game") return;
 
     if (mode === "solo") {
-      startEngine(selectedSong, Date.now() + 150);
-      return;
-    }
+  if (startedRef.current) return;
+
+  startEngine(selectedSong, Date.now() + 150);
+  return;
+}
 
     if (
       room?.startAt &&
@@ -2598,7 +2601,7 @@ const chooseRandomSong = useCallback(() => {
     setScreen("difficulty");
   }, []);
 
-  const confirmSoloDifficulty = useCallback(async () => {
+ const confirmSoloDifficulty = useCallback(async () => {
   if (beatmapLoading) return;
 
   setBeatmapLoading(true);
@@ -2614,12 +2617,17 @@ const chooseRandomSong = useCallback(() => {
 
     preparedBeatmapRef.current = preparedBeatmap;
 
-    setMessage("Beatmap ready! Tap START SONG.");
     setSoloReadyToStart(true);
+    setMessage("Beatmap ready. Tap START SONG.");
   } catch (error) {
     console.error("Solo beatmap preparation failed:", error);
+
     preparedBeatmapRef.current = null;
-    setMessage("Could not prepare the automatic beatmap.");
+    setSoloReadyToStart(false);
+
+    setMessage(
+      "The beatmap could not be created. Please try again."
+    );
   } finally {
     setBeatmapLoading(false);
   }
@@ -2631,13 +2639,15 @@ const chooseRandomSong = useCallback(() => {
 
 const startPreparedSoloSong = useCallback(async () => {
   if (!preparedBeatmapRef.current) {
-    setMessage("The beatmap is not ready yet.");
+    setSoloReadyToStart(false);
+    setMessage("The beatmap is not ready. Create it again.");
     return;
   }
 
   try {
     if (preparedAudioRef.current) {
       preparedAudioRef.current.pause();
+      preparedAudioRef.current.currentTime = 0;
       preparedAudioRef.current = null;
     }
 
@@ -2647,17 +2657,26 @@ const startPreparedSoloSong = useCallback(async () => {
     audio.volume = 0.88;
     audio.currentTime = 0;
 
-    await audio.play();
+    // Unlock audio during the user's button press.
+audio.muted = true;
+await audio.play();
+audio.pause();
+audio.currentTime = 0;
+audio.muted = false;
 
-    preparedAudioRef.current = audio;
+preparedAudioRef.current = audio;
 
-    startedRef.current = false;
-    setSoloReadyToStart(false);
-    setMessage("");
-    setScreen("game");
+startedRef.current = false;
+finishedRef.current = false;
+
+setSoloReadyToStart(false);
+setMessage("");
+setScreen("game");
   } catch (error) {
     console.error("Solo audio start failed:", error);
-    setMessage("Audio was blocked. Tap START SONG again.");
+
+    preparedAudioRef.current = null;
+    setMessage("The song could not start. Tap START SONG again.");
   }
 }, [selectedSong]);
 
@@ -3179,7 +3198,24 @@ const startPreparedSoloSong = useCallback(async () => {
           <img className="mba-difficulty-cover" src={selectedSong.cover} alt={selectedSong.title} />
           <div className="mba-difficulty-list">
             {difficulties.map((difficulty) => (
-              <button key={difficulty.id} type="button" className={selectedDifficulty === difficulty.id ? "mba-difficulty-card selected" : "mba-difficulty-card"} onClick={() => setSelectedDifficulty(difficulty.id)}>
+              <button
+  key={difficulty.id}
+  type="button"
+  className={
+    selectedDifficulty === difficulty.id
+      ? "mba-difficulty-card selected"
+      : "mba-difficulty-card"
+  }
+  onClick={() => {
+    setSelectedDifficulty(difficulty.id);
+
+    if (songSelectionSource !== "online") {
+      setSoloReadyToStart(false);
+      preparedBeatmapRef.current = null;
+      setMessage("");
+    }
+  }}
+>
                 <span>{difficulty.label}</span><small>{difficulty.detail}</small>
               </button>
             ))}
@@ -3189,21 +3225,28 @@ const startPreparedSoloSong = useCallback(async () => {
   <button
     type="button"
     onClick={async () => {
-    if (songSelectionSource === "online") {
+      if (songSelectionSource === "online") {
         await voteDifficulty(selectedDifficulty);
         setScreen("lobby");
         return;
-    }
+      }
 
-    confirmSoloDifficulty();
+      if (soloReadyToStart) {
+        await startPreparedSoloSong();
+        return;
+      }
+
+      await confirmSoloDifficulty();
     }}
     disabled={beatmapLoading}
   >
     {beatmapLoading
-    ? "CREATING BEATMAP..."
-    : songSelectionSource === "online"
-        ? `CHOOSE ${selectedDifficulty}`
-        : `START ${selectedDifficulty}`}
+      ? "CREATING BEATMAP..."
+      : songSelectionSource === "online"
+      ? `CHOOSE ${selectedDifficulty}`
+      : soloReadyToStart
+      ? "START SONG"
+      : `CREATE ${selectedDifficulty} BEATMAP`}
   </button>
 </div>
       </section>
