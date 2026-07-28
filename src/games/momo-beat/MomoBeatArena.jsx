@@ -764,6 +764,10 @@ const preparedBeatmapRef = useRef(null);
   return {
     uid: user?.uid || fallbackUid,
     name:
+      user?.username ||
+      user?.playerName ||
+      user?.accountName ||
+      user?.profile?.username ||
       user?.displayName ||
       user?.name ||
       "Player",
