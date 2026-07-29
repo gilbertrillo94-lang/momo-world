@@ -2186,7 +2186,7 @@ if (
       const lane = LANE_META[note.lane];
 
       context.shadowColor = lane.glow;
-      context.shadowBlur = 18;
+      context.shadowBlur = Math.max(4, 18 / noteSpeed);
       context.fillStyle = lane.color;
       context.beginPath();
       context.roundRect(x, y - 12, width, 24, 10);
@@ -2198,7 +2198,7 @@ if (
       context.roundRect(x + 5, y - 8, width - 10, 5, 4);
       context.fill();
     });
-    }, [noteApproachMs]);
+    }, [noteApproachMs, noteSpeed]);
 
   const registerMiss = useCallback(() => {
     const stats = statsRef.current;
