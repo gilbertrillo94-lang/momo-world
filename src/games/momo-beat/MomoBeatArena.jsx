@@ -24,6 +24,10 @@ import {
 const MAX_PLAYERS = 6;
 const APPROACH_MS = 1550;
 
+const MIN_NOTE_SPEED = 1;
+const MAX_NOTE_SPEED = 6;
+const NOTE_SPEED_STEP = 0.5;
+
 const HIT_WINDOWS = {
   perfect: 52,
   great: 96,
@@ -707,7 +711,28 @@ export default function MomoBeatArena({
   const [resultRows, setResultRows] = useState([]);
 
   const [beatmapLoading, setBeatmapLoading] = useState(false);
-const [soloReadyToStart, setSoloReadyToStart] = useState(false);
+  const [soloReadyToStart, setSoloReadyToStart] = useState(false);
+ 
+  const [noteSpeed, setNoteSpeed] = useState(() => {
+  const savedSpeed = Number(
+    localStorage.getItem("momo-beat-note-speed")
+  );
+
+  if (!Number.isFinite(savedSpeed)) {
+    return MIN_NOTE_SPEED;
+  }
+
+  const roundedSpeed =
+    Math.round(savedSpeed / NOTE_SPEED_STEP) *
+    NOTE_SPEED_STEP;
+
+  return clamp(
+    roundedSpeed,
+    MIN_NOTE_SPEED,
+    MAX_NOTE_SPEED
+  );
+});
+
   const canvasRef = useRef(null);
   const audioRef = useRef(null);
   const preparedAudioRef = useRef(null);
@@ -777,6 +802,27 @@ const preparedBeatmapRef = useRef(null);
 
   const selectedSong =
     SONGS.find((song) => song.id === selectedSongId) || SONGS[0];
+const noteApproachMs = APPROACH_MS / noteSpeed;
+
+useEffect(() => {
+  localStorage.setItem(
+    "momo-beat-note-speed",
+    String(noteSpeed)
+  );
+}, [noteSpeed]);
+
+const changeNoteSpeed = useCallback((direction) => {
+  setNoteSpeed((currentSpeed) => {
+    const nextSpeed =
+      currentSpeed + direction * NOTE_SPEED_STEP;
+
+    return clamp(
+      nextSpeed,
+      MIN_NOTE_SPEED,
+      MAX_NOTE_SPEED
+    );
+  });
+}, []);
 
 useEffect(() => {
   if (screen !== "songs") {
@@ -2131,7 +2177,7 @@ if (
       if (note.judged) return;
 
       const progress =
-        1 - (note.time - currentTime) / APPROACH_MS;
+  1 - (note.time - currentTime) / noteApproachMs;
 
       const y = clamp(progress, 0, 1) * hitLineY;
       const x = note.lane * laneWidth + 8;
@@ -2152,7 +2198,7 @@ if (
       context.roundRect(x + 5, y - 8, width - 10, 5, 4);
       context.fill();
     });
-  }, []);
+    }, [noteApproachMs]);
 
   const registerMiss = useCallback(() => {
     const stats = statsRef.current;
@@ -2430,7 +2476,7 @@ countdownTimersRef.current.push(
             chartRef.current[
               nextNoteIndexRef.current
             ].time <=
-              currentMs + APPROACH_MS
+  currentMs + noteApproachMs
           ) {
             visibleNotesRef.current.push({
               ...chartRef.current[
@@ -2507,6 +2553,7 @@ countdownTimersRef.current.push(
     drawCanvas,
     finishGame,
     mode,
+    noteApproachMs,
     publishLiveScore,
     registerMiss,
     room?.difficulty,
@@ -3222,9 +3269,47 @@ setScreen("game");
 >
                 <span>{difficulty.label}</span><small>{difficulty.detail}</small>
               </button>
-            ))}
+                        ))}
+          </div>
+
+          <div className="mba-note-speed-control">
+            <div className="mba-note-speed-copy">
+              <strong>NOTE SPEED</strong>
+              <small>PERSONAL · VISUAL ONLY</small>
+            </div>
+
+            <div className="mba-note-speed-actions">
+              <button
+                type="button"
+                className="mba-note-speed-button"
+                onClick={() => changeNoteSpeed(-1)}
+                disabled={noteSpeed <= MIN_NOTE_SPEED}
+                aria-label="Decrease note speed"
+              >
+                −
+              </button>
+
+              <strong className="mba-note-speed-value">
+                {noteSpeed.toFixed(1)}×
+              </strong>
+
+              <button
+                type="button"
+                className="mba-note-speed-button"
+                onClick={() => changeNoteSpeed(1)}
+                disabled={noteSpeed >= MAX_NOTE_SPEED}
+                aria-label="Increase note speed"
+              >
+                +
+              </button>
+
+              <small className="mba-note-speed-range">
+                1.0×–6.0× · Changes by 0.5×
+              </small>
+            </div>
           </div>
         </main>
+
        <div className="mba-song-bottom-bar">
   <button
     type="button"

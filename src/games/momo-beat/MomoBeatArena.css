@@ -1996,6 +1996,96 @@
 .mba-difficulty-card.selected { border-color:var(--mba-accent); box-shadow:0 0 0 2px color-mix(in srgb,var(--mba-accent) 25%,transparent); background:rgba(255,255,255,.13); }
 .mba-difficulty-card span { font-size:15px; font-weight:1000; }
 .mba-difficulty-card small { color:var(--mba-muted); font-size:10px; }
+.mba-note-speed-control {
+  grid-column: 1 / -1;
+  min-height: 88px;
+  padding: 15px 16px;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 14px;
+  border: 1px solid var(--mba-border);
+  border-radius: 19px;
+  background: rgba(20, 15, 42, 0.76);
+}
+
+.mba-note-speed-copy {
+  min-width: 0;
+  display: grid;
+  gap: 4px;
+}
+
+.mba-note-speed-copy strong {
+  color: var(--mba-gold);
+  font-size: 14px;
+  font-weight: 1000;
+  letter-spacing: 0.04em;
+}
+
+.mba-note-speed-copy small {
+  color: rgba(169, 143, 255, 0.82);
+  font-size: 9px;
+  font-weight: 900;
+  letter-spacing: 0.08em;
+}
+
+.mba-note-speed-actions {
+  display: grid;
+  grid-template-columns: 42px 88px 42px;
+  align-items: center;
+  justify-content: end;
+  gap: 8px;
+}
+
+.mba-note-speed-button {
+  width: 42px;
+  height: 42px;
+  display: grid;
+  place-items: center;
+  padding: 0;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 50%;
+  color: var(--mba-white);
+  background: rgba(255, 255, 255, 0.06);
+  font-size: 24px;
+  font-weight: 900;
+  line-height: 1;
+}
+
+.mba-note-speed-button:active:not(:disabled) {
+  transform: scale(0.94);
+  background: rgba(255, 255, 255, 0.13);
+}
+
+.mba-note-speed-button:disabled {
+  opacity: 0.3;
+  cursor: not-allowed;
+}
+
+.mba-note-speed-value {
+  min-height: 42px;
+  display: grid;
+  place-items: center;
+  padding: 0 12px;
+  border-radius: 16px;
+  color: #171126;
+  background: linear-gradient(
+    135deg,
+    var(--mba-gold),
+    var(--mba-pink)
+  );
+  font-size: 20px;
+  font-weight: 1000;
+  white-space: nowrap;
+}
+
+.mba-note-speed-range {
+  grid-column: 1 / -1;
+  color: var(--mba-muted);
+  font-size: 9px;
+  text-align: center;
+  white-space: nowrap;
+}
 .mba-difficulty-votes { display:grid; grid-template-columns:repeat(2,1fr); gap:8px; }
 .mba-difficulty-votes button { min-height:58px; padding:10px; display:grid; gap:2px; border:1px solid var(--mba-border); border-radius:16px; color:white; background:rgba(255,255,255,.055); }
 .mba-difficulty-votes button.selected { border-color:rgba(255,227,110,.72); background:rgba(255,227,110,.11); }
@@ -4462,4 +4552,40 @@ box-shadow:
 
 .mba-difficulty-screen .mba-song-bottom-bar button {
   width: 100%;
+}
+@media (max-width: 430px) {
+  .mba-note-speed-control {
+    min-height: 82px;
+    padding: 12px;
+    gap: 10px;
+  }
+
+  .mba-note-speed-copy strong {
+    font-size: 12px;
+  }
+
+  .mba-note-speed-copy small {
+    font-size: 7px;
+  }
+
+  .mba-note-speed-actions {
+    grid-template-columns: 36px 76px 36px;
+    gap: 6px;
+  }
+
+  .mba-note-speed-button {
+    width: 36px;
+    height: 36px;
+    font-size: 21px;
+  }
+
+  .mba-note-speed-value {
+    min-height: 36px;
+    padding: 0 8px;
+    font-size: 18px;
+  }
+
+  .mba-note-speed-range {
+    font-size: 7px;
+  }
 }
