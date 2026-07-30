@@ -1430,14 +1430,18 @@ useEffect(() => {
   bgm.loop = true;
   bgm.volume = 0.2;
 
-  if (settings.sound) {
+  const shouldPlayRoomBgm =
+    settings.sound && screen !== "momo-beat-arena";
+
+  if (shouldPlayRoomBgm) {
     bgm.play().catch(() => {});
   } else {
     bgm.pause();
+    bgm.currentTime = 0;
   }
 
   return () => bgm.pause();
-}, [bgm, settings.sound]);
+}, [bgm, settings.sound, screen]);
 
   useEffect(() => {
     const timer = setInterval(() => {
