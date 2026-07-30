@@ -789,12 +789,11 @@ const preparedBeatmapRef = useRef(null);
   return {
     uid: user?.uid || fallbackUid,
     name:
-      user?.username ||
-      user?.playerName ||
       user?.accountName ||
-      user?.profile?.username ||
+      user?.profile?.accountName ||
       user?.displayName ||
-      user?.name ||
+      user?.profile?.displayName ||
+      user?.username ||
       "Player",
     avatar: momoImage,
   };
